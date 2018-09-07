@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+ 
+<!ELEMENT GTSConfig (ConfigProperties?, Welcome?, PropertyGroup+, Completion?)>
+
+<!ELEMENT ConfigProperties (Property+)>
+
+<!ELEMENT Welcome (#PCDATA)>
+
+<!ELEMENT Property (#PCDATA)>
+	<!ATTLIST PropertyItem key CDATA #REQUIRED>
+
+<!ELEMENT PropertyGroup (Description?, Separator*, PropertyItem+)>
+	<!ATTLIST PropertyGroup name CDATA #REQUIRED>
+	<!ATTLIST PropertyGroup class CDATA #IMPLIED>
+
+<!ELEMENT Description (#PCDATA)>
+    
+<!ELEMENT Separator (#PCDATA)>
+
+<!ELEMENT PropertyItem (Description, ToolTip?, Help?, FieldLength?, DefaultValue?, Selection?, ReadOnly?)>
+	<!ATTLIST PropertyItem key CDATA #REQUIRED>
+	<!ATTLIST PropertyItem type CDATA #REQUIRED>
+	<!ATTLIST PropertyItem readOnly CDATA #IMPLIED>
+
+<!ELEMENT FieldLength (#PCDATA)>
+
+<!ELEMENT DefaultValue (#PCDATA)>
+
+<!ELEMENT ToolTip (#PCDATA)>
+
+<!ELEMENT Help (#PCDATA)>
+
+<!ELEMENT Selection (SelectionItem+)>
+
+<!ELEMENT SelectionItem (#PCDATA)>
+	<!ATTLIST SelectionItem key CDATA #REQUIRED>
+    
+<!ELEMENT ReadOnly (#PCDATA)>
+	<!ATTLIST ReadOnly readOnly CDATA #IMPLIED>
+	<!ATTLIST ReadOnly unless CDATA #IMPLIED>

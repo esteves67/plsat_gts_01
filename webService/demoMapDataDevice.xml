@@ -1,0 +1,10 @@
+<!-- 
+ === Request map data (pushpins) the device "demo2"
+ -->
+<GTSRequest command="mapdata">
+    <Authorization account="demo" user="admin" password=""/>
+    <MapData>
+        <Device>demo2</Device>
+    </MapData>
+</GTSRequest>
+

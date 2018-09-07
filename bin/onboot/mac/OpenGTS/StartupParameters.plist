@@ -1,0 +1,11 @@
+{
+    Description     = "GTS Device Communications Server";
+    Provides        = ("OpenGTS");
+    Requires        = ("Resolver");
+    OrderPreference = "None";
+    Messages =
+    {
+        start = "Starting GTS Device Communications Server ... ";
+        stop  = "Stopping GTS Device Communications Server ... ";
+    };
+}

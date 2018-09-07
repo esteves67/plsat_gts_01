@@ -1,0 +1,967 @@
+@import url(http://fonts.googleapis.com/css?family=Open+Sans:400,700,300);
+@import url(http://fonts.googleapis.com/css?family=Quicksand:400);
+@import url(http://fonts.googleapis.com/css?family=Open+Sans+Condensed:300,700);
+@import url(//fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600,700,900,200italic,300italic,400italic,600italic,700italic,900italic|Dosis:200,300,400,500,600,700,800|Lato:100,300,400,700,900,100italic,300italic,400italic,700italic,900italic);
+
+/***** clearfix *****/
+.clear {clear: both;height: 0;line-height: 0;}
+.clearfix:after {content: ".";display: block;height: 0;clear: both;visibility: hidden;}
+.clearfix {display: inline-block;}
+/* Hides from IE-mac \*/
+* html .clearfix {height: 1%;}
+.clearfix {display: block;}
+/* End hide from IE-mac */
+.clearfix {height: 1%;}
+.clearfix {display: block;}
+
+.TituloCuenta {
+	font-family:Verdana, Geneva, sans-serif;
+	font-size:18px;
+	color:#FFF;
+	font-weight:bold;
+}
+
+.TextoBienvenida {
+	font-family:Verdana, Geneva, sans-serif
+	font-size:12px;
+	color:#FFF;
+}
+
+.fancybox-custom .fancybox-skin {
+	box-shadow: 0 0 50px #222;
+}
+
+.texto_blanco{
+	padding: .7em 15px;
+	font-family: Helvetica,Arial,sans-serif;
+	color:#FFF;
+	text-shadow: 0 1px 1px #194b7e;
+	font-weight: bold;
+	font-size: 12.5px;
+}
+.userDescription{
+	padding: .7em 15px;
+	font-family: Verdana;
+	color:#FFF;
+	text-shadow: 0 1px 1px #194b7e;
+	font-size: 11px;
+}
+
+a:link {
+	text-decoration: none;
+	color: #900;
+}
+a:visited {
+	text-decoration: none;
+	color: #900;
+}
+a:hover {
+	text-decoration: none;
+	color: #9C0;
+}
+a:active {
+	text-decoration: none;
+	color: #900;
+}
+
+.locationDetailsReportTitle{
+	border-top-left-radius: 12px;
+	border-top-right-radius: 12px;
+	color:#FFF;
+	font-family: "Source Sans Pro", Tahoma, Geneva;
+	font-size:16px;
+	background-color:#005B9F;
+	cursor: move;
+	padding-bottom: 5px;
+}
+
+.lastEventDeviceInfo{
+	font-family:Verdana, Geneva, sans-serif;
+	font-size:9px;
+	color: #FFF;
+}
+#lastEventDate{
+	font-family: "Source Sans Pro", Tahoma, Geneva;
+	font-size: 11px;
+	color: #FFFF00;
+	cursor: pointer;
+}
+#lastEventTime{
+	color:#fff;
+}
+#lastEventTmz{
+	color:#fff;
+}
+#buttonMenuDiv{
+	z-index:3;
+	position: absolute;
+	left:12px;	
+	bottom:28px;
+}
+#buttonMenuTable{
+	background-color:#FFF;
+	border-radius: 14px;
+	-moz-box-shadow: 0 0 5px 3px #888;
+	-webkit-box-shadow: 0 0 3px 5px #888;
+	box-shadow: 0 0 5px 3px #888;
+}
+
+#calendarSelectorDiv{
+	z-index: 1;
+	position:absolute;
+	left:90px;
+	top: 70px;
+}
+#calendarReportButton{
+	cursor: pointer;
+}
+.calendarReportCaption{
+	border-top-left-radius: 12px;
+	border-top-right-radius: 12px;
+	color:#FFF;
+	font-family: "Source Sans Pro", Tahoma, Geneva;
+	font-size:16px;
+	background-color:#005B9F;
+	cursor: move;
+	padding-bottom: 5px;
+}
+#calDiv{
+	margin:auto;
+}
+.replayButton{
+	font-family: "Source Sans Pro", Tahoma, Geneva;
+	font-size:12px;
+	text-align:center;
+	color: #036
+}
+.cursorLocationTitle{
+	font-family: "Source Sans Pro", Tahoma, Geneva;
+	font-size: 12px;
+	color: #004A6F;
+	font-weight:bold;
+	text-align:center;
+	cursor: text;
+}
+#trackMapLatLonDisplay{
+	font-family: "Source Sans Pro", Tahoma, Geneva;
+	font-size:12px;
+	text-align:center;
+
+}
+#mapUpdateButton{
+	background-color: #E9E9E9;
+	border-radius: 8px;
+}
+#UpdateMap{
+	
+}
+label{
+	font-family: "Source Sans Pro", Tahoma, Geneva;
+	font-size:12px;
+}
+#leftMenuTable{
+	width: 160px;
+	height: 255px;
+	background-color: #fff;/*#005B9F;*/
+	border: 2px solid #005B9F;
+	border-radius: 15px;
+	-moz-box-shadow: 0 0 5px 3px #888;
+	-webkit-box-shadow: 0 0 3px 5px #888;
+	box-shadow: 0 0 5px 3px #888;
+}
+#calendarSelectorTable{
+	width: 160px;
+	height: auto;
+	
+}
+#calendarSelectorTableTo{
+	width: 170px;
+	height: 160px;
+}
+.calendarSelectorTitle{
+	padding:4px;
+	color:#FFF;
+}
+#infoDeviceDiv{
+	z-index: 2;
+	position:absolute;
+	left:90px;
+	bottom:26px;
+	width:275px;
+}
+#infoDeviceTable{
+	background-color: #005B9F;
+	border: 1px solid #fff;
+	border-radius: 15px;
+	height: 200px;
+	-moz-box-shadow: 0 0 5px 3px #888;
+	-webkit-box-shadow: 0 0 3px 5px #888;
+	box-shadow: 0 0 5px 3px #888;
+}
+
+#infoDeviceTableRow{
+	background-color:#fff;
+	height:120px;
+	vertical-align:central;
+}
+.infoDeviceTableDescription{
+	font-family: "Source Sans Pro", Tahoma, Geneva;
+	padding-left: 5px;
+	padding-right: 5px;
+	font-size:16px;
+	color: #fff;
+	text-align:center;
+	alignment-adjust:central;
+	alignment-baseline:central;
+	text-rendering: optimizelegibility;
+	margin-top: 0 !important;
+}
+.infoDeviceColumn{
+	font-family: "Source Sans Pro", Tahoma, Geneva;
+	font-size: 12px;
+	color: #333;
+	padding-left: 10px;	
+}
+.infoDeviceTableLicensePlate{
+	font-family: "Open Sans", Tahoma, Geneva;
+	font-size: 13px;
+	font-weight:bold;
+	color: #156973;
+	padding-left: 10px;
+	
+}
+.infoDeviceTableSimcard{
+	font-family: "Open Sans", Tahoma, Geneva;
+	font-size: 13px;
+	font-weight:bold;
+	color: #156973;
+	padding-left: 10px;
+}
+.infoDeviceTableUniqueID{
+	font-family: "Source Sans Pro", Tahoma, Geneva;
+	font-size: 12px;
+	color: #333;
+	padding-left: 10px;
+}
+.infoDeviceTableOdom{
+	font-family: "Source Sans Pro", Tahoma, Geneva;
+	font-size: 12px;
+	color: #333;
+	padding-left: 10px;
+}
+.infoDeviceTableValue{
+	font-family: "Source Sans Pro", Tahoma, Geneva;
+	font-size: 12px;
+	color: #333;
+	padding-left: 10px;
+}
+
+#speedo {
+	z-index: 4;
+	width:280px; 
+	height:150px;
+	position: absolute;
+	bottom: 28px; 
+	right: 60px;
+	opacity: 0.9;
+	cursor:move;
+}
+#trackMapDataTable{
+	z-index:3;
+	position: absolute;
+	top: 70px;
+	right: 0.8%;
+	overflow-y: scroll;
+	overflow-x: hidden;
+	height:380px;
+	max-height:380px;
+	margin:auto;
+	width:auto
+}
+
+#LocationDetailsReport{
+	alignment-adjust:central;
+	text-align:center;
+	alignment-baseline:central;
+	vertical-align:central;
+	border-radius: 15px;
+}
+
+#bateria {
+	z-index: 4;
+	position: absolute;
+	bottom: 50px; 
+	right: 50px;
+	cursor: move;
+}
+#trafficButton {
+	z-index: 5;
+	position:absolute;
+	float:left;
+	/*bottom: 0;
+	left:0;
+	top:0;*/
+
+	cursor:pointer;
+}
+#weatherButton {
+	z-index: 5;
+	/*bottom: 0;
+	left:0;
+	top:0;*/
+	right:100px;
+	cursor:pointer;
+}
+#cloudsButton {
+	z-index: 5;
+	/*bottom: 0;
+	left:0;
+	top:0;*/
+	right:300px;
+	cursor:pointer;
+}
+.GButton{
+	background-color: #0066B3;
+	color:#FFF;
+	cursor: pointer;
+	padding:10px;
+	display:inline-block;
+	vertical-align:middle;
+}
+.GButton-Sel{
+	background-color: #000;
+	color:#FFF;
+	cursor: pointer;
+	padding:10px;
+	display:inline-block;
+	vertical-align:middle;
+}
+#listaEmail{
+	display:none;
+	position:absolute;
+	float:left;
+	top:0;
+}
+
+#systemContainer{
+	min-height:100%;
+	height:100%;
+}
+
+
+/*Padding para el contenedor del menu lateral*/
+#buttonPanel {padding:3px;}
+		
+/*Cursos para la botonera de los mapas*/
+#botonera {cursor:pointer;}	
+		
+.infoBoxContactTitle{
+	text-shadow: 0 1px 1px #194b7e;
+	padding-top:8px;
+	padding-left:15px;
+	padding-bottom:4px;
+	font:Verdana, Geneva, sans-serif;
+	font-size:20px;
+	color:#FFF;
+}
+.infoBoxAccountName{
+	text-align: right;
+	padding-right: 18px;
+	font-family: Helvetica,Arial,sans-serif;
+	color: #000;
+	font-weight:bold;
+	font-size: 16px;
+}
+.infoBoxAccountPhone{
+	text-shadow: 0 1px 1px #194b7e;
+	padding-top:8px;
+	padding-left:15px;
+	padding-bottom:10px;
+	font:Verdana, Geneva, sans-serif;
+	font-size:16px;
+	color:#FFF;
+}
+#infobox{
+	float:right;
+	position: inherit;
+	bottom: 0; 
+	right:0; 
+	text-align:right
+}
+#infoTable{		
+}
+#contactus{
+	float:right;
+	position:relative;
+	font: Verdana, Geneva, sans-serif;
+	font-size: 14px;
+	color: #FFF;
+	text-align: center;
+	width: 333px;
+	background-color: #2478AA;
+	border-color: #FFF;
+	border-style: solid;
+	border-width: thin;
+	border-top-left-radius: 9px;
+	border-top-right-radius: 9px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	cursor: pointer;
+}
+#contactus:hover{
+	font: Verdana, Geneva, sans-serif;
+	font-size: 14px;
+	background-color: #4ba3d8;
+}
+
+#loginAguilaRow{
+	position: absolute;
+	background-image:url(../images/fondo_login.jpg);
+	background-repeat:no-repeat;
+	background-position:right;
+	top:0;
+	left:0;
+	right:0;
+	bottom:100;
+	margin: auto;
+	height: 393px;
+	width: 1008px;
+	opacity: 0.9;
+	}
+.textLoginForm {
+	font-family: Verdana, Geneva, sans-serif;
+	font-size: 12px;
+	font-style: normal;
+	line-height: normal;
+	font-weight: normal;
+	font-variant: normal;
+	color: #000;
+	height: 30px;
+}
+.textLoginForm a:link{
+	font-family: Verdana, Geneva, sans-serif;
+	font-size: 12px;
+	font-style: normal;
+	line-height: normal;
+	font-weight: normal;
+	font-variant: normal;
+	color: #FFF;
+	height: 30px;
+}
+.textLoginForm a:visited{
+	font-family: Verdana, Geneva, sans-serif;
+	font-size: 12px;
+	font-style: normal;
+	line-height: normal;
+	font-weight: normal;
+	font-variant: normal;
+	color: #093E61;
+	height: 30px;
+}
+.textLoginForm a:active{
+	font-family: Verdana, Geneva, sans-serif;
+	font-size: 12px;
+	font-style: normal;
+	line-height: normal;
+	font-weight: normal;
+	font-variant: normal;
+	color: #FFF;
+	height: 30px;
+}
+.textLoginForm a:hover{
+	font-family: Verdana, Geneva, sans-serif;
+	font-size: 12px;
+	font-style: normal;
+	line-height: normal;
+	font-weight: normal;
+	font-variant: normal;
+	color: #00BCED;
+	height: 30px;
+}
+TD.textInputLoginAguila{
+	padding-left:10px;
+}
+.inputLoginFormTextbox{
+	border-radius:4px;
+	padding-left: 5px;
+	color: #3399CC;
+	font-family: Verdana, Geneva, sans-serif;
+	font-size: 12px;
+	height:23px;
+}
+.inputLoginFormTextbox:focus{
+	border-radius: 4px;
+	padding-left: 5px;
+	background-color: #000;
+	color: #00BCED;
+	font-family: Verdana, Geneva, sans-serif;
+	font-size: 12px;
+	height: 23px;
+}
+.loginButton {
+	font-family: Verdana, Geneva, sans-serif;
+	font-size: 12px;
+	color:#fff;
+	padding-left: 8px;
+	padding-right: 8px;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	border-color: transparent;
+	cursor: pointer;
+	background-color: #0472A6;
+}
+.loginButton:hover {
+	background-color: #333333;
+}
+
+#deviceMemberGroup{
+	border: 1px solid black;
+	height: 100%;
+	width: 500px;
+	overflow-x: hidden;
+	overflow-y: scroll;
+	alignment-baseline: central;
+	text-align: center;
+	background-color: white;
+	margin: auto;
+	border-radius: 5px;
+	padding: 10px;
+}
+#plataformaFooter{
+	width: 100%;
+	height: 15px;
+	background-color: #F00;
+	color: #FFF;
+	text-align: center;
+}
+/* Panel Tab/button */
+.tab {
+  	background: url(img_tab/tab_b.png) repeat-x 0 0;
+	height: 42px;
+	position: relative;
+    top: 0;
+    z-index: -999;
+}
+.tab ul.login {
+	display: block;
+	position: relative;
+  	float: right;
+  	clear: right;
+  	height: 42px;
+	width: auto;
+  	font-weight: bold;
+	line-height: 42px;
+	margin: 0;
+	right: 150px;
+  	color: white;
+  	font-size: 80%;
+	text-align: center;
+}
+
+.tab ul.login li.left {
+  	background: url(img_tab/tab_l.png) no-repeat left 0;
+  	height: 42px;
+	width: 30px;
+	padding: 0;
+	margin: 0;
+  	display: block;
+	float: left;
+}
+
+.tab ul.login li.right {
+  	background: url(img_tab/tab_r.png) no-repeat left 0;
+  	height: 42px;
+	width: 30px;
+	padding: 0;
+	margin: 0;
+  	display: block;
+	float: left;
+}
+
+.tab ul.login li {
+	font-family: Verdana, Geneva, sans-serif;
+	font-size: 11px;
+ 	text-align: left;
+  	padding: 0 6px;
+	display: block;
+	float: left;
+	height: 42px;
+  	background: url(img_tab/tab_m.png) repeat-x 0 0;
+}
+.tab ul.login li span{
+	font-family: Verdana, Geneva, sans-serif;
+	font-size: 11px;
+ 	color:#FC0;
+}
+.tab ul.login li .bluetext{
+	font-size:9px;
+	color: #26C0D0;
+}
+
+.tab ul.login li a {
+	color: #15ADFF;
+}
+
+.tab ul.login li a:hover {
+	color: white;
+}
+.tab .sep {
+	color: #666666
+}
+
+.tab a.open, .tab a.close {
+	
+	height: 20px;
+	line-height: 20px !important;
+	padding-left: 30px !important;
+	cursor: pointer;
+	display: block;
+	width: 10px; /* link central */
+	position: relative;
+	top: 11px;
+}
+
+.tab a.open {background: url(img_tab/bt_open.png) no-repeat left 0;}
+.tab a.close {background: url(img_tab/bt_close.png) no-repeat left 0;}
+.tab a:hover.open {background: url(img_tab/bt_open.png) no-repeat left -19px;}
+.tab a:hover.close {background: url(img_tab/bt_close.png) no-repeat left -19px;}
+/* sliding panel */
+#toppanel {
+    position: absolute;   /*Panel will overlap  content */
+    /*position: relative;*/   /*Panel will "push" the content down */
+    top: 0;
+    width: 100%;
+    z-index: 999;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#panel {
+	width: 100%;
+	height: 155px;/*270px*/
+	color: #999999;
+	background-color:#272727;
+	background-image:url(../images/bg_slide.jpg);
+	background-repeat: repeat-x;
+	background-position: center;
+	overflow: hidden;
+	position: relative;
+	z-index: 3;
+	display: none;
+}
+
+#panel h1 {
+	font-family: 'PT Sans Narrow', Arial, sans-serif;
+	font-size: 20px;
+	text-shadow: 0px 0px 1px #000;
+	padding: 5px 0 10px;
+	margin: 0;
+	color: white;
+	clear: both;
+	
+}
+
+#panel h2{
+	font-size: 1.2em;
+	padding: 10px 0 5px;
+	margin: 0;
+	color: white;
+}
+
+#panel p {
+	margin: 5px 0;
+	padding: 0;
+}
+
+#panel a {
+	text-decoration: none;
+	color: #15ADFF;
+}
+
+#panel a:hover {
+	color: white;
+}
+
+#panel a-lost-pwd {
+	display: block;
+	float: left;
+}
+
+#panel .content {
+	width: 960px;
+	margin: 0 auto;
+	padding-top: 15px;
+	text-align: left;
+	font-size: 0.85em;
+}
+
+#panel .content .left {
+	width: 280px;
+	float: left;
+	padding: 0 15px;
+	border-left: 1px solid #333;
+}
+
+#panel .content .right {
+	border-right: 1px solid #333;
+}
+
+#panel .content form {
+	margin: 0 0 10px 0;
+}
+
+#panel .content label {
+	float: left;
+	padding-top: 8px;
+	clear: both;
+	width: 280px;
+	display: block;
+}
+
+#panel .content input.field {
+	border: 1px #1A1A1A solid;
+	background: #414141;
+	margin-right: 5px;
+	margin-top: 4px;
+	width: 200px;
+	color: white;
+	height: 16px;
+}
+
+#panel .content input:focus.field {
+	background: #545454;
+}
+
+/* BUTTONS */
+/* Login and Register buttons */
+#panel .content input.bt_login,
+#panel .content input.bt_register {
+	display: block;
+	float: left;
+	clear: left;
+	height: 24px;
+	text-align: center;
+	cursor: pointer;
+	border: none;
+	font-weight: bold;
+	margin: 10px 0;
+}
+
+#panel .content input.bt_login {
+	width: 74px;
+	background: transparent url(img_tab/bt_login.png) no-repeat 0 0;
+}
+
+#panel .content input.bt_register {
+	width: 94px;
+	color: white;
+	background: transparent url(img_tab/bt_register.png) no-repeat 0 0;
+}
+
+#panel .lost-pwd {
+	display: block;
+	float:left;
+	clear: right;
+	padding: 15px 5px 0;
+	font-size: 0.95em;
+	text-decoration: underline;
+}
+.accountDesc{
+	font-family: "Source Sans Pro", Tahoma, Geneva;
+	font-size:16px;
+	color: #FFC926;
+	height: 25px;
+	vertical-align:central;
+	text-align:right
+}
+.accountPhone{
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size:12px;
+	color: #FFF;
+	height: auto;
+	vertical-align:central;
+	text-align:right
+}
+.accountEmail{
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size:11px;
+	color: #C8C8C8;
+	height: auto;
+	vertical-align:central;
+	text-align:right
+}
+.menuEvNormal{
+	font-family: "Source Sans Pro", Tahoma, Geneva;
+	font-size:18px;
+	text-rendering: optimizelegibility;
+	color: #FFBF00;
+	height: auto;
+	vertical-align:central;
+	text-align: center;
+	height: 30px;
+	cursor: pointer;
+}
+.menuEvPlugin, .menuEvPlugin a{
+	/*display:none;*/
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size:18px;
+	/*font-weight:bold;*/
+	font-weight: 200;
+	text-rendering: optimizelegibility;
+	color: #26C0D0;
+	height: auto;
+	vertical-align:central;
+	text-align: center;
+	height: 30px;
+	cursor: pointer;
+}
+#tdEvolution{
+	height: 20px;
+	vertical-align: central;
+	text-align: center;
+}
+#tdEvolution a,#tdEvolution a:link, #tdEvolution a:active, #tdEvolution a:visited{
+	font-family: "Open Sans", Tahoma, Geneva;
+	font-size: 13px;
+	/*font-weight:bold;
+	font-weight: 200;*/
+	text-rendering: optimizelegibility;
+	color: #C7C7C7;
+	cursor: pointer;
+}
+#tdEvolution a:hover{
+	font-family: "Open Sans", Tahoma, Geneva;
+	font-size:13px;
+	border-bottom:1px solid #FFBF00;
+	/*font-weight:bold;
+	font-weight: 200;*/
+	text-rendering: optimizelegibility;
+	color: #26C0D0;
+	vertical-align:central;
+	text-align: center;
+	height: 30px;
+	-webkit-transition: all .1s ease-in;
+	-moz-transition: all .1s ease-in;
+	-o-transition: all .1s ease-in;
+	transition: all .1s ease-in;
+}
+#tdEvolution2 a,#tdEvolution2 a:link, #tdEvolution2 a:active, #tdEvolution2 a:visited{
+	font-family: "Open Sans", Tahoma, Geneva;
+	font-size: 13px;
+	/*font-weight:bold;
+	font-weight: 200;*/
+	text-rendering: optimizelegibility;
+	color: #C7C7C7;
+	cursor: pointer;
+}
+#tdEvolution2 a:hover{
+	font-family: "Open Sans", Tahoma, Geneva;
+	font-size:13px;
+	border-bottom:1px solid #FFBF00;
+	/*font-weight:bold;
+	font-weight: 200;*/
+	text-rendering: optimizelegibility;
+	color: #26C0D0;
+	vertical-align:central;
+	text-align: center;
+	height: 30px;
+	-webkit-transition: all .1s ease-in;
+	-moz-transition: all .1s ease-in;
+	-o-transition: all .1s ease-in;
+	transition: all .1s ease-in;
+}
+#tdEvolutionKit a,#tdEvolutionKit a:link, #tdEvolutionKit a:active, #tdEvolutionKit a:visited{
+	font-family: "Open Sans", Tahoma, Geneva;
+	font-size: 13px;
+	/*font-weight:bold;
+	font-weight: 200;*/
+	text-rendering: optimizelegibility;
+	color: #26C0D0;
+	cursor: pointer;
+}
+#tdEvolutionKit a:hover{
+	font-family: "Open Sans", Tahoma, Geneva;
+	font-size:13px;
+	border-bottom:1px solid #FFBF00;
+	/*font-weight:bold;
+	font-weight: 200;*/
+	text-rendering: optimizelegibility;
+	color: #FFCC00;
+	vertical-align:central;
+	text-align: center;
+	height: 30px;
+	-webkit-transition: all .1s ease-in;
+	-moz-transition: all .1s ease-in;
+	-o-transition: all .1s ease-in;
+	transition: all .1s ease-in;
+}
+#tdEvolutionAdmin a,#tdEvolutionAdmin a:link, #tdEvolutionAdmin a:active, #tdEvolutionAdmin a:visited{
+	font-family: "Open Sans", Tahoma, Geneva;
+	font-size: 13px;
+	/*font-weight:bold;
+	font-weight: 200;*/
+	text-rendering: optimizelegibility;
+	color: #FFCC00;
+	cursor: pointer;
+}
+#tdEvolutionAdmin a:hover{
+	font-family: "Open Sans", Tahoma, Geneva;
+	font-size:13px;
+	border-bottom:1px solid #FFBF00;
+	/*font-weight:bold;
+	font-weight: 200;*/
+	text-rendering: optimizelegibility;
+	color: #26C0D0;
+	vertical-align:central;
+	text-align: center;
+	height: 30px;
+	-webkit-transition: all .1s ease-in;
+	-moz-transition: all .1s ease-in;
+	-o-transition: all .1s ease-in;
+	transition: all .1s ease-in;
+}
+
+/* Icons Menu Top Jquery */
+.tab a.back{
+	background: url(../images/back.png) no-repeat left 0;
+	height: 22px;
+	line-height: 22px !important;
+	padding-left: 5px !important;
+	cursor: pointer;
+	display: block;
+	width: 20px; /* link central */
+	position: relative;
+	top: 11px;
+}
+
+.tab a.home{
+	background: url(../images/home.png) no-repeat left 0;
+	height: 18px;
+	line-height: 22px !important;
+	padding-left: 5px !important;
+	cursor: pointer;
+	display: block;
+	width: 20px; /* link central */
+	position: relative;
+	top: 11px;
+}
+
+.tab a.devmap{
+	background: url(../images/devmap.png) no-repeat left 0;
+	height: 18px;
+	line-height: 22px !important;
+	padding-left: 5px !important;
+	cursor: pointer;
+	display: block;
+	width: 20px; /* link central */
+	position: relative;
+	top: 11px;
+}
+#infoLegendDiv{
+	z-index: 2;
+	position:absolute;
+	left:90px;
+	bottom:26px;
+	width:250px;
+}

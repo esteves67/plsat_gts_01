@@ -1,0 +1,46 @@
+#!/usr/bin/perl
+# -----------------------------------------------------------------------------
+# read data from specified UDP port
+# Usage:  readUDP [-host <bindHost>] -port <port>
+# -----------------------------------------------------------------------------
+
+# --- options
+use Getopt::Long;
+%argctl = (
+    "host=s" => \$opt_host,
+    "port=i" => \$opt_port
+);
+if (!&GetOptions(%argctl) || !$opt_port || ($opt_port <= 0)) {
+    print "Usage: $0 [-help] -port <port>\n";
+    print "  -p[ort] <port>  Log port number\n";
+    print "  -h[elp]         Print this help (usage)\n";
+    exit(1);
+}
+
+# --- open client
+use IO::Socket;
+if (defined $opt_host) {
+    $logSock = IO::Socket::INET->new(LocalHost=>"$opt_host", LocalPort=>$opt_port, Proto=>"udp", Reuse=>1);
+} else {
+    $logSock = IO::Socket::INET->new(LocalPort=>$opt_port, Proto=>"udp", Reuse=>1);
+}
+if (!$logSock) { die "<udp socket open failed> $!\n"; }
+
+# --- read forever
+$| = 1; # - autoflush
+vec($rbits, $logSock->fileno, 1) = 1;
+while (1) {
+    my $rbitsTemp = $rbits;
+    if (select($rbitsTemp, undef, undef, 600)) {
+        my $fromAddr = $logSock->recv($msg, 400, 0);
+        #print "Received from address: $fromAddr\n";
+        if ($msg =~ /\n$/) {
+            print "$msg";
+        } else {
+            print "$msg\n";
+        }
+    }
+}
+
+# ---
+

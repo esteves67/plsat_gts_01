@@ -1,0 +1,53 @@
+<!-- 
+===============================================================================
+Project: OpenGTS - Open GPS Tracking System
+URL    : http://www.opengts.org
+File   : build_intellitrac.xml
+===============================================================================
+This file is intended to be imported by "build.xml"
+===============================================================================
+-->
+
+<!-- Copyright 2008-2012 GeoTelematic Solutions, Inc. -->
+<project name="GTS Enterprise Sanav Server" basedir=".">
+
+  <!-- Server jar classpath -->
+  <property name="EServer_Jar_Classpath" value="gtsutils.jar gtsdb.jar ruledb.jar bcrossdb.jar optdb.jar custom.jar"/>
+
+  <!-- ======================================================================== -->
+  <!-- ======================================================================== -->
+
+  <!-- Target: Device Parser Module Sanav GC-101 -->
+  <target name="sanav" depends="prepare,gtsdb" 
+    description="Create 'Device Parser Module' Sanav GC-101 ...">
+    <echo message="Sanav GC-101/GX-101 server 'sanav.jar' ..."/>
+    <javac srcdir="${src.gts}"
+        includeAntRuntime="false"
+        source="${compiler.source}"
+        target="${compiler.target}"
+        destdir="${build.home}"
+        debug="${compile.debug}"
+        nowarn="${compile.nowarn}"
+        deprecation="${compile.deprecation}"
+        optimize="${compile.optimize}">
+        <compilerarg compiler="${compiler.compiler}" value="${compile.Xlint}"/>
+        <classpath refid="compile.classpath"/>
+        <include name="org/opengts/extra/servers/*.java"/>
+        <include name="org/opengts/extra/servers/sanav/**/*.java"/>
+    </javac>
+    <jar jarfile="${build.lib}/sanav.jar">
+        <manifest>
+            <attribute name="Class-Path" value="${EServer_Jar_Classpath}"/>
+            <attribute name="Main-Class" value="org.opengts.extra.servers.sanav.Main"/>
+        </manifest>
+        <fileset dir="${build.home}">
+            <include name="org/opengts/extra/servers/*.class"/>
+            <include name="org/opengts/extra/servers/sanav/**/*.class"/>
+        </fileset>
+    </jar>
+  </target>
+
+  <!-- ======================================================================== -->
+  <!-- ======================================================================== -->
+
+</project>

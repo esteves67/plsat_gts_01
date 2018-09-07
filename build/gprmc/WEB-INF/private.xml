@@ -1,0 +1,450 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no' ?>
+<!DOCTYPE PrivateLabels SYSTEM "private.dtd" >
+
+<PrivateLabels i18nPackage="org.opengts.db">
+
+<!-- ==================================================================================== -->
+<!-- Supported Locales  ================================================================= -->
+<!-- This list is used to populate the language selection pull-down menu on the login page.
+ === To display the language selection pull-down menu on the login page, make sure that the
+ === property "accountLogin.showLocaleSelection" is set to true.
+ -->
+<SupportedLocales>
+<Locale id="de" i18n="PrivateXML.locale.german"    >German</Locale>
+    <Locale id="en" i18n="PrivateXML.locale.english"   >English</Locale>
+    <Locale id="es" i18n="PrivateXML.locale.spanish"   >Spanish</Locale>
+    <Locale id="fr" i18n="PrivateXML.locale.french"    >French</Locale>
+</SupportedLocales>
+
+<!-- ==================================================================================== -->
+<!-- Default TimeZones  ================================================================= -->
+<TimeZones>
+    US/Hawaii  US/Alaska  US/Pacific  US/Arizona  US/Mountain  US/Central  US/Eastern
+    Canada/Pacific  Canada/Mountain  Canada/Central  Canada/Eastern  Canada/Atlantic
+    Mexico/BajaNorte  Mexico/BajaSur  Mexico/General
+    Europe/Athens  Europe/Berlin  Europe/Dublin  Europe/Helsinki  Europe/Kiev   Europe/Lisbon
+    Europe/London  Europe/Madrid  Europe/Moscow  Europe/Oslo      Europe/Paris  Europe/Rome
+    Europe/Stockholm  Europe/Zurich
+    Pacific/Auckland  Pacific/Chatham
+    Australia/West  Australia/North  Australia/South  Australia/Queensland  Australia/NSW
+    GMT  GMT+00:00
+    GMT+01:00  GMT+02:00  GMT+03:00  GMT+04:00  GMT+05:00  GMT+05:30  GMT+06:00  GMT+07:00
+    GMT+08:00  GMT+09:00  GMT+10:00  GMT+11:00  GMT+12:00  GMT+13:00  GMT+14:00  
+    GMT-01:00  GMT-02:00  GMT-03:00  GMT-04:00  GMT-05:00             GMT-06:00  GMT-07:00
+    GMT-08:00  GMT-09:00  GMT-10:00  GMT-11:00  GMT-12:00
+</TimeZones>
+
+<!-- ================================================================================= -->
+
+<!-- 
+ *** Default/Backstop RT properties
+ *** These properties provide the 'backstop' (default) properties defined in any Include
+ *** directives below.
+ -->
+<Properties>
+
+    <!-- Uncomment to enable map geozone geocoding -->
+    <Property key="Domain.Properties.zoneInfo.enableGeocode">true</Property>
+    <Property key="Domain.Properties.trackMap.enableGeocode">true</Property>
+    <Property key="Domain.GeocodeProvider.active">google</Property>
+
+    <!-- MapProvider -->
+    <Property key="Domain.MapProvider.active">openLayers</Property>
+    <Property key="Domain.MapProvider.auto.enable">true</Property>
+    <Property key="Domain.MapProvider.auto.interval">60</Property>
+    <Property key="Domain.MapProvider.auto.count">5</Property>
+    <Property key="Domain.MapProvider.zone.map.width">630</Property>
+    <Property key="Domain.MapProvider.zone.map.height">540</Property>
+
+    <!-- ReverseGeocodeProvider -->
+    <Property key="Domain.ReverseGeocodeProvider.active">true</Property>
+
+    <!-- DeviceInfo -->
+    <Property key="Domain.Properties.deviceInfo.showExpectedAcks">false</Property>
+
+    <!-- Misc Reports -->
+    <Property key="Domain.Reports.EventThermo">false</Property>
+    <Property key="Domain.Reports.PropertyValue">false</Property>
+    <Property key="Domain.Reports.DiagnosticValue">false</Property>
+    <Property key="Domain.Reports.EventSpeedPosted">false</Property>
+    <Property key="Domain.Reports.EventWaymark0Detail">false</Property>
+    <Property key="Domain.Reports.EventWaymark1Detail">false</Property>
+    <Property key="Domain.Reports.DriverMessageDetail">false</Property>
+
+    <!-- OBD Reports -->
+    <!-- <Property key="Domain.Reports.EventFaultCodes">false</Property> -->
+
+</Properties>
+
+<!-- ========================================================================================== -->
+<!-- Default Pushpins ========================================================================= -->
+
+<!-- The "Pushpins" tag section allows overriding the pushpins displayed on the map. -->
+<!-- These are the standard Google icons - ->
+<Pushpins baseURL="http://labs.google.com/ridefinder/images/">
+    <Pushpin key="black"  icon="mm_20_black.png"  iconSize="12,20" iconOffset="6,20" shadow="mm_20_shadow.png" shadowSize="22,20"/>
+    <Pushpin key="brown"  icon="mm_20_brown.png"  iconSize="12,20" iconOffset="6,20" shadow="mm_20_shadow.png" shadowSize="22,20"/>
+    <Pushpin key="red"    icon="mm_20_red.png"    iconSize="12,20" iconOffset="6,20" shadow="mm_20_shadow.png" shadowSize="22,20"/>
+    <Pushpin key="orange" icon="mm_20_orange.png" iconSize="12,20" iconOffset="6,20" shadow="mm_20_shadow.png" shadowSize="22,20"/>
+    <Pushpin key="yellow" icon="mm_20_yellow.png" iconSize="12,20" iconOffset="6,20" shadow="mm_20_shadow.png" shadowSize="22,20"/>
+    <Pushpin key="green"  icon="mm_20_green.png"  iconSize="12,20" iconOffset="6,20" shadow="mm_20_shadow.png" shadowSize="22,20"/>
+    <Pushpin key="blue"   icon="mm_20_blue.png"   iconSize="12,20" iconOffset="6,20" shadow="mm_20_shadow.png" shadowSize="22,20"/>
+    <Pushpin key="purple" icon="mm_20_purple.png" iconSize="12,20" iconOffset="6,20" shadow="mm_20_shadow.png" shadowSize="22,20"/>
+    <Pushpin key="gray"   icon="mm_20_gray.png"   iconSize="12,20" iconOffset="6,20" shadow="mm_20_shadow.png" shadowSize="22,20"/>
+    <Pushpin key="white"  icon="mm_20_white.png"  iconSize="12,20" iconOffset="6,20" shadow="mm_20_shadow.png" shadowSize="22,20"/>
+</Pushpins>
+<!- - -->
+
+<!-- The "Pushpins" tag section allows overriding the default pushpins displayed on the map. -->
+<!-- (these icons were created using the "Marker Maker" tool at "http://www.gmaplive.com/marker_maker.php") -->
+<Pushpins baseURL="images/pp/">
+    <!-- override standard color pushpins -->
+        <Pushpin key="black"      icon="pin30_black.png"      shadow="pin30_shadow.png" iconSize="18,30" iconOffset="9,30" shadowSize="30,30"/>
+        <Pushpin key="brown"      icon="pin30_brown.png"      shadow="pin30_shadow.png" iconSize="18,30" iconOffset="9,30" shadowSize="30,30"/>
+        <Pushpin key="red"        icon="pin30_red.png"        shadow="pin30_shadow.png" iconSize="18,30" iconOffset="9,30" shadowSize="30,30"/>
+        <Pushpin key="orange"     icon="pin30_orange.png"     shadow="pin30_shadow.png" iconSize="18,30" iconOffset="9,30" shadowSize="30,30"/>
+        <Pushpin key="yellow"     icon="pin30_yellow.png"     shadow="pin30_shadow.png" iconSize="18,30" iconOffset="9,30" shadowSize="30,30"/>
+        <Pushpin key="green"      icon="pin30_green.png"      shadow="pin30_shadow.png" iconSize="18,30" iconOffset="9,30" shadowSize="30,30"/>
+        <Pushpin key="blue"       icon="pin30_blue.png"       shadow="pin30_shadow.png" iconSize="18,30" iconOffset="9,30" shadowSize="30,30"/>
+        <Pushpin key="purple"     icon="pin30_purple.png"     shadow="pin30_shadow.png" iconSize="18,30" iconOffset="9,30" shadowSize="30,30"/>
+        <Pushpin key="gray"       icon="pin30_gray.png"       shadow="pin30_shadow.png" iconSize="18,30" iconOffset="9,30" shadowSize="30,30"/>
+        <Pushpin key="white"      icon="pin30_white.png"      shadow="pin30_shadow.png" iconSize="18,30" iconOffset="9,30" shadowSize="30,30"/>
+        <!-- other solid colors -->
+        <Pushpin key="darkred"    icon="pin30_darkred.png"    shadow="pin30_shadow.png" iconSize="18,30" iconOffset="9,30" shadowSize="30,30"/>
+        <Pushpin key="darkgreen"  icon="pin30_darkgreen.png"  shadow="pin30_shadow.png" iconSize="18,30" iconOffset="9,30" shadowSize="30,30"/>
+        <Pushpin key="darkblue"   icon="pin30_darkblue.png"   shadow="pin30_shadow.png" iconSize="18,30" iconOffset="9,30" shadowSize="30,30"/>
+        <Pushpin key="darkpurple" icon="pin30_darkpurple.png" shadow="pin30_shadow.png" iconSize="18,30" iconOffset="9,30" shadowSize="30,30"/>
+        <Pushpin key="teal"       icon="pin30_teal.png"       shadow="pin30_shadow.png" iconSize="18,30" iconOffset="9,30" shadowSize="30,30"/>
+        <Pushpin key="salmon"     icon="pin30_salmon.png"     shadow="pin30_shadow.png" iconSize="18,30" iconOffset="9,30" shadowSize="30,30"/>
+        <Pushpin key="gold"       icon="pin30_gold.png"       shadow="pin30_shadow.png" iconSize="18,30" iconOffset="9,30" shadowSize="30,30"/>
+        <Pushpin key="pink"       icon="pin30_pink.png"       shadow="pin30_shadow.png" iconSize="18,30" iconOffset="9,30" shadowSize="30,30"/>
+        <Pushpin key="lime"       icon="pin30_lime.png"       shadow="pin30_shadow.png" iconSize="18,30" iconOffset="9,30" shadowSize="30,30"/>
+        <Pushpin key="bluegray"   icon="pin30_bluegray.png"   shadow="pin30_shadow.png" iconSize="18,30" iconOffset="9,30" shadowSize="30,30"/>
+        <Pushpin key="magenta"    icon="pin30_magenta.png"    shadow="pin30_shadow.png" iconSize="18,30" iconOffset="9,30" shadowSize="30,30"/>
+        <!-- some additional pushpins -->
+        <Pushpin key="reddot"     icon="pin30_red_dot.png"    shadow="pin30_shadow.png" iconSize="18,30" iconOffset="9,30" shadowSize="30,30"/>
+        <Pushpin key="greendot"   icon="pin30_green_dot.png"  shadow="pin30_shadow.png" iconSize="18,30" iconOffset="9,30" shadowSize="30,30"/>
+        <Pushpin key="bluedot"    icon="pin30_blue_dot.png"   shadow="pin30_shadow.png" iconSize="18,30" iconOffset="9,30" shadowSize="30,30"/>
+</Pushpins>
+
+<!-- Multiple 'Pushpins' tags may be specified -->
+<Pushpins baseURL="images/pp/">
+    <!-- 
+     === This example shows how a custom pushpin marker can be generated from within Javascript itself.
+     === The Javascript function argument 'e' below, is a pointer to a 'MapEventRecord' object which 
+     === contains the following properties relative to the current event:
+     ===   device    : The Device ID
+     ===   timestamp : The Epoch timestamp
+     ===   date      : The date (formatted per the Domain/Account specifications)
+     ===   time      : The time (formatted per the Domain/Account specifications)
+     ===   code      : The StatusCode description
+     ===   iconNdx   : The icon index
+     ===   latitude  : The Latitude
+     ===   longitude : The Longitude
+     ===   speedKPH  : The speed in km/h
+     ===   speedMPH  : The speed in mph
+     ===   heading   : The heading (in drgrees)
+     ===   compass   : The compas heading (N,NE,E,SE,S,SW,W,NW)
+     ===   altitude  : The altitude in meters
+     ===   address   : The street address (may be blank if address is not available)
+     === =======================
+     === The example Javascript functions 'evHeadingYellowURL', 'evHeadingGreenURL', and 'evHeadingMarkerURL',
+     === can be found in the 'jsmap.js' file and analyzes the event 'heading' and returns a URL reference that 
+     === indicates the direction of travel. 
+     === =======================
+     === The Pushpin keys "all", "fleet", "stop", "moving", "last" below are used by the icon
+     === selector "<EventData>.getPushpinIconIndex(...)" to select a pushpin icon for the map.
+     -->
+    <!-- If uncommented, the "all" key will control ALL icon selections for the map -->
+    <!--
+    <Pushpin key="all"        eval="evHeadingMarkerURL(e)"    iconSize="18,30" iconOffset="9,30" shadow="pin30_shadow.png" shadowSize="30,30" image="pin30_green_h1.png"/>
+    <Pushpin key="moving"     eval="evHeadingMarkerURL(e)"    iconSize="18,30" iconOffset="9,30" shadow="pin30_shadow.png" shadowSize="30,30" image="pin30_green_h1.png"/>
+    <Pushpin key="stop"       icon="pin30_red_dot.png"        iconSize="18,30" iconOffset="9,30" shadow="pin30_shadow.png" shadowSize="30,30"/>
+     -->
+    <Pushpin key="fleet"      icon="pin30_blue_dot.png"       iconSize="18,30" iconOffset="9,30" shadow="pin30_shadow.png" shadowSize="30,30"/>
+</Pushpins>
+<Pushpins baseURL="images/pp/">
+    <Pushpin key="greenh"     eval="evHeadingGreenURL(e)"     iconSize="18,30" iconOffset="9,30" shadow="pin30_shadow.png" shadowSize="30,30" image="pin30_green_h1.png"/>
+    <Pushpin key="yellowh"    eval="evHeadingYellowURL(e)"    iconSize="18,30" iconOffset="9,30" shadow="pin30_shadow.png" shadowSize="30,30" image="pin30_yellow_h1.png"/>
+    <Pushpin key="heading"    eval="evHeadingMarkerURL(e)"    iconSize="18,30" iconOffset="9,30" shadow="pin30_shadow.png" shadowSize="30,30" image="pin30_green_h1.png"/>
+    <Pushpin key="heading_eu" eval="evHeadingMarkerURL_eu(e)" iconSize="18,30" iconOffset="9,30" shadow="pin30_shadow.png" shadowSize="30,30" image="pin30_green_h1.png"/>
+    <Pushpin key="heading_ca" eval="evHeadingMarkerURL_ca(e)" iconSize="18,30" iconOffset="9,30" shadow="pin30_shadow.png" shadowSize="30,30" image="pin30_green_h1.png"/>
+</Pushpins>
+
+<Pushpins baseURL="images/icons/">
+        <Pushpin key="4x4"		icon="4x4.png"				shadow="4x4_shadow.png" iconSize="40,35" iconOffset="9,30" shadowSize="62,35" />
+        <Pushpin key="medi"		icon="ambulancia.png"		shadow="ambulancia_shadow.png" 	iconSize="32,32" iconOffset="9,30" shadowSize="52,32" />
+        <Pushpin key="bcar"		icon="auto_negro.png"		shadow="auto_negro_shadow.png" 	iconSize="32,32" iconOffset="9,30" shadowSize="52,32" />
+        <Pushpin key="rcar"		icon="auto_rojo.png"		shadow="auto_rojo_shadow.png" 	iconSize="32,32" iconOffset="9,30" shadowSize="52,32" />
+        <Pushpin key="rgray"	icon="auto_gris.png"		shadow="auto_gris_shadow.png" 	iconSize="32,32" iconOffset="9,30" shadowSize="52,32" />
+        <Pushpin key="banco"	icon="banco.png"			shadow="banco_shadow.png" 		iconSize="32,32" iconOffset="9,30" shadowSize="52,32" />
+        <Pushpin key="rflag"	icon="bandera_roja.png"		shadow="bandera_roja_shadow.png"	iconSize="32,32" iconOffset="9,30" shadowSize="52,32" />
+        <Pushpin key="ffight"	icon="bomberos.png"			shadow="bomberos_shadow.png" 	iconSize="32,32" iconOffset="9,30" shadowSize="52,32" />
+        <Pushpin key="burro"	icon="burro.png"			shadow="burro_shadow.png" 		iconSize="32,32" iconOffset="9,30" shadowSize="52,32" />
+        <Pushpin key="enable"	icon="enable1.png"			shadow="bandera_roja_shadow.png" 		iconSize="45,45" iconOffset="9,30" shadowSize="52,32" />
+        <Pushpin key="disable"	icon="disable1.png"			shadow="bandera_roja_shadow.png" 		iconSize="45,45" iconOffset="9,30" shadowSize="52,32" />
+        <Pushpin key="bus"		icon="bus.png"				shadow="bus_shadow.png" 		iconSize="40,35" iconOffset="9,30" shadowSize="62,35" />
+        <Pushpin key="yeltruck"	icon="camino_amarillo.png"	shadow="camino_amarillo_shadow.png" iconSize="32,32" iconOffset="9,30" shadowSize="52,32" />
+        <Pushpin key="blktruck"	icon="camion_negro.png"		shadow="camion_negro_shadow.png" iconSize="32,32" iconOffset="9,30" shadowSize="52,32" />
+        <Pushpin key="rgntruck"	icon="camion_verde.png"		shadow="camion_verde_shadow.png" iconSize="32,32" iconOffset="9,30" shadowSize="52,32" />
+        <Pushpin key="dino"		icon="dino.png"				shadow="dino_shadow.png" 	iconSize="32,32" iconOffset="9,30" shadowSize="52,32" />
+        <Pushpin key="excav"	icon="excavadora.png"		shadow="excavadora_shadow.png" iconSize="32,32" iconOffset="9,30" shadowSize="52,32" />
+        <Pushpin key="fabrica"	icon="fabrica.png"	shadow="fabrica_shadow.png" iconSize="32,32" iconOffset="9,30" shadowSize="52,32" />
+        <Pushpin key="farmacia"	icon="farmacia.png"	shadow="farmacia_shadow.png" iconSize="32,32" iconOffset="9,30" shadowSize="52,32" />
+        <Pushpin key="gas"		icon="gas.png"	shadow="gas_shadow.png" iconSize="32,32" iconOffset="9,30" shadowSize="52,32" />
+        <Pushpin key="grua"		icon="grua.png"	shadow="grua_shadow.png" iconSize="32,32" iconOffset="9,30" shadowSize="52,32" />
+        <Pushpin key="h100"		icon="h100.png"	shadow="h100_shadow.png" iconSize="40,35" iconOffset="9,30" shadowSize="62,35" />
+        <Pushpin key="home"		icon="home.png"	shadow="home_shadow.png" iconSize="32,32" iconOffset="9,30" shadowSize="52,32" />
+        <Pushpin key="hospital"	icon="hospital.png"	shadow="hospital_shadow.png" iconSize="32,32" iconOffset="9,30" shadowSize="52,32" />
+        <Pushpin key="mzcldr"	icon="mezcladora.png"	shadow="mezcladora_shadow.png" iconSize="32,32" iconOffset="9,30" shadowSize="52,32" />
+        <Pushpin key="milenium"	icon="milenium.png"	shadow="milenium_shadow.png" iconSize="32,32" iconOffset="9,30" shadowSize="52,32" />
+        <Pushpin key="moto"		icon="moto.png"	shadow="moto_shadow.png" iconSize="32,32" iconOffset="9,30" shadowSize="52,32" />
+        <Pushpin key="grnbike"	icon="moto_verde.png"	shadow="moto_verde_shadow.png" iconSize="32,32" iconOffset="9,30" shadowSize="52,32" />
+        <Pushpin key="naboo"	icon="naboo.png"	shadow="naboo_shadow.png" iconSize="32,32" iconOffset="9,30" shadowSize="52,32" />
+        <Pushpin key="patito"	icon="patito.png"	shadow="patito_shadow.png" iconSize="32,32" iconOffset="9,30" shadowSize="52,32" />
+        <Pushpin key="persona"	icon="persona.png"	shadow="persona_shadow.png" iconSize="32,32" iconOffset="9,30" shadowSize="52,32" />
+        <Pushpin key="peru"		icon="peru.png"	shadow="peru_shadow.png" iconSize="32,32" iconOffset="9,30" shadowSize="52,32" />
+        <Pushpin key="pickup"	icon="pickup.png"	shadow="pickup_shadow.png" iconSize="32,32" iconOffset="9,30" shadowSize="52,32" />
+        <Pushpin key="pinguino"	icon="pinguino.png"	shadow="pinguino_shadow.png" iconSize="32,32" iconOffset="9,30" shadowSize="52,32" />
+        <Pushpin key="policia"	icon="policia.png"	shadow="policia_shadow.png" iconSize="32,32" iconOffset="9,30" shadowSize="52,32" />
+        <Pushpin key="4x4"		icon="pickup_4x4.png"	shadow="pickup_4x4_shadow.png" iconSize="40,35" iconOffset="9,30" shadowSize="62,35" />
+        <Pushpin key="probox"	icon="probox.png"	shadow="probox_shadow.png" iconSize="40,35" iconOffset="9,30" shadowSize="62,35" />
+        <Pushpin key="r2d2"		icon="r2d2.png"	shadow="r2d2_shadow.png" iconSize="32,32" iconOffset="9,30" shadowSize="52,32" />
+        <Pushpin key="raton"	icon="raton.png"	shadow="raton_shadow.png" iconSize="32,32" iconOffset="9,30" shadowSize="52,32" />
+        <Pushpin key="remolque"	icon="remolque.png"	shadow="remolque_shadow.png" iconSize="32,32" iconOffset="9,30" shadowSize="52,32" />
+        <Pushpin key="sniper"	icon="sniper.png"	shadow="sniper_shadow.png" iconSize="32,32" iconOffset="9,30" shadowSize="52,32" />
+        <Pushpin key="taxi"		icon="taxi.png"	shadow="taxi_shadow.png" iconSize="32,32" iconOffset="9,30" shadowSize="52,32" />
+        <Pushpin key="templo"	icon="templo.png"	shadow="templo_shadow.png" iconSize="32,32" iconOffset="9,30" shadowSize="52,32" />
+        <Pushpin key="tibirium"	icon="tibirium.png"	shadow="tibirium_shadow.png" iconSize="32,32" iconOffset="9,30" shadowSize="52,32" />
+        <Pushpin key="tiefight"	icon="tiefighter.png"	shadow="tiefighter_shadow.png" iconSize="32,32" iconOffset="9,30" shadowSize="52,32" />
+        <Pushpin key="trailer"	icon="trailerimage.png"	shadow="trailerimage_shadow.png" iconSize="32,32" iconOffset="9,30" shadowSize="52,32" />
+        <Pushpin key="tren"		icon="tren.png"	shadow="tren_shadow.png" iconSize="32,32" iconOffset="9,30" shadowSize="52,32" />
+        <Pushpin key="volvo2"	icon="volvo_azul.png"	shadow="volvo_azul_shadow.png" iconSize="40,35" iconOffset="9,30" shadowSize="62,35" />
+        <Pushpin key="volvo1"	icon="volvo_blanco.png"	shadow="volvo_blanco_shadow.png" iconSize="40,35" iconOffset="9,30" shadowSize="62,35" />
+        <Pushpin key="xwing"	icon="xwing.png"	shadow="xwing_shadow.png" iconSize="32,32" iconOffset="9,30" shadowSize="52,32" />
+    </Pushpins>
+ 
+<!-- "Last" pushpin 
+ === If one of the following "last" pushin definitions is uncommented, the last 
+ === pushpin on the map within the date range will display the specified icon.
+ -->
+<Pushpins baseURL="">
+    <!-- "last": red animated 'cross-hair' - ->
+    <Pushpin key="last" 
+        icon="extra/images/pp/CrosshairRed.gif" iconSize="32,32" iconOffset="16,16" 
+        image="extra/images/pp/CrosshairRed.gif"/>    <!- - -->
+    <!-- "last": animated 'cross-hair', color based on vehicle speed - ->
+    <Pushpin key="last" 
+        eval="evSpeedLastURL(e)" iconSize="32,32" iconOffset="16,16" 
+        image="extra/images/pp/CrosshairRed.gif"/>    <!- - -->
+    <!-- "last": 'heading' pushpin on animated red 'cross-hair' background -->
+    <Pushpin key="last" 
+        eval="evHeadingMarkerURL(e)" iconSize="18,30" iconOffset="9,30" 
+        shadow="images/pp/pin30_shadow.png" shadowSize="30,30" 
+        back="extra/images/pp/CrosshairRed.gif" backSize="32,32" backOffset="16,16"
+        image="extra/images/pp/CrosshairRed.gif"/>
+    <Pushpin key="lastlabel" 
+        eval="evDeviceNameIconURL(e)" iconSize="47,24" iconOffset="9,24" 
+        back="extra/images/pp/CrosshairRed.gif" backSize="32,32" backOffset="16,16"
+        image="images/pp/label47_fill.png"/>
+    <Pushpin key="lastage" 
+        eval="evAgeMarkerURL(e)" iconSize="18,30" iconOffset="9,30" 
+        shadow="images/pp/pin30_shadow.png" shadowSize="30,30" 
+        back="extra/images/pp/CrosshairRed.gif" backSize="32,32" backOffset="16,16"
+        image="extra/images/pp/CrosshairRed.gif"/>
+</Pushpins>
+
+<!-- Text Label pushpin -->
+<Pushpins baseURL="">
+    <!--
+     === - This uses image "label47_fill.png" and calls back to 'Track.java' (see PAGE_MARKER)
+     ===   to write the device short name into the png image.  "label47_fill.png" can handle
+     ===   text up to 6 or 7 characters long (using 9pt font).
+     === - To use this feature, edit the Device information (using the Device Admin page), add
+     ===   a 'Short Name', and select "label" for the 'Group Pushpin ID'.  The icon will show
+     ===   on the fleet map with the embedded short-name text (if a short name has not been
+     ===   entered, the DeviceID will be used).
+     -->
+    <Pushpin key="devlabel"   eval="evDeviceNameIconURL(e)"          iconSize="47,24" iconOffset="9,24" image="images/pp/label47_fill.png"/>
+    <Pushpin key="devlbl_r"   eval="evDeviceNameIconURL(e,'FF8888')" iconSize="47,24" iconOffset="9,24" image="Marker?icon=/images/pp/label47_fill.png&amp;fill=FF8888"/>
+    <Pushpin key="devlbl_g"   eval="evDeviceNameIconURL(e,'88FF88')" iconSize="47,24" iconOffset="9,24" image="Marker?icon=/images/pp/label47_fill.png&amp;fill=88FF88"/>
+    <Pushpin key="devlbl_b"   eval="evDeviceNameIconURL(e,'8888FF')" iconSize="47,24" iconOffset="9,24" image="Marker?icon=/images/pp/label47_fill.png&amp;fill=8888FF"/>
+    <Pushpin key="devlbl_y"   eval="evDeviceNameIconURL(e,'FFFF88')" iconSize="47,24" iconOffset="9,24" image="Marker?icon=/images/pp/label47_fill.png&amp;fill=FFFF88"/>
+    <!-- "evDeviceNameIconURL" is defined in 'jsmap.js' -->
+</Pushpins>
+
+<!-- Indexed pushpin -->
+<!-- http://localhost:8080/track/Marker?icon=/images/pp/pin30_cyan.png&fr=3,4,11,7,10&color=000000&arrow=270 -->
+<Pushpins baseURL="">
+    <Pushpin key="pp_arrow_c" eval="evArrowIconURL(e,'/images/pp/pin30_cyan.png','4,4,11,11,0','black')"   iconSize="18,30" iconOffset="9,30"  shadow="pin30_shadow.png" image="Marker?icon=/images/pp/pin30_cyan.png&amp;fr=4,4,11,11,0&amp;color=000000&amp;arrow=45"/>
+    <Pushpin key="pp_arrow_y" eval="evArrowIconURL(e,'/images/pp/pin30_yellow.png','4,4,11,11,0','black')" iconSize="18,30" iconOffset="9,30"  shadow="pin30_shadow.png" image="Marker?icon=/images/pp/pin30_yellow.png&amp;fr=4,4,11,11,0&amp;color=000000&amp;arrow=45"/>
+    <Pushpin key="arrow_spd"  eval="evArrowIconURL(e,'/images/clear20.png','0,0,18,18,0')"                 iconSize="20,20" iconOffset="10,10" shadow=""                 image="Marker?icon=/images/clear20.png&amp;fr=0,0,18,18,0&amp;color=DD0000&amp;arrow=45"/>
+    <Pushpin key="arrow_grn"  eval="evArrowIconURL(e,'/images/clear20.png','0,0,18,18,0','green')"         iconSize="20,20" iconOffset="10,10" shadow=""                 image="Marker?icon=/images/clear20.png&amp;fr=0,0,18,18,0&amp;color=00DD00&amp;arrow=45"/>
+    <!-- "evArrowIconURL" is defined in 'jsmap.js' -->
+</Pushpins>
+
+<!-- Indexed pushpin -->
+<Pushpins baseURL="images/pp/">
+    <Pushpin key="indexed"    eval="evIndexedIconURL(e)" iconSize="18,30" iconOffset="9,30" shadow="pin30_shadow.png" shadowSize="30,30" image="pin30_blue_fill.png"/>
+    <!-- "evDeviceNameIconURL" is defined in 'jsmap.js' -->
+</Pushpins>
+    
+<!-- custom -->
+<!-- EventData.defaultPushpinName=custom -->
+<Pushpins baseURL="custom/">
+    <Pushpin key="custom"     eval="customMarkerURL(e)"  iconSize="18,30" iconOffset="9,30" shadow="pin30_shadow.png" shadowSize="30,30" image="pin30_green_h1.png"/>
+</Pushpins>
+
+<!-- ================================================================================= -->
+
+<!-- 
+ *** Default Legend
+ *** Note: This attempts to load a default Legend from the '.conf' files
+ -->
+<Legend type="device" includeDefault="true"/>
+<Legend type="fleet"  includeDefault="true"/>
+
+<!-- ================================================================================= -->
+<!-- Default Domain -->
+<Include dir="private" file="private_common.xml">
+
+    <!-- Domain attributes -->
+    <Property key="Domain.name">default</Property>
+    <Property key="Domain.host">*</Property>
+
+    <!-- Copyright -->
+    <!-- <Property key="Domain.Copyright">Copyright(C) GeoTelematic Solutions, Inc.</Property> -->
+
+    <!-- 'loginSession.jsp' -->
+    <!--
+    <Property key="Domain.Properties.login.showPoweredByOpenGTS">false</Property>
+    <Property key="Domain.Properties.login.showPiLink">true</Property>
+    <Property key="Domain.Properties.login.piLink">http://www.opengts.com</Property>
+    <Property key="Domain.Properties.login.hideBannerAfterLogin">false</Property>
+    -->
+
+    <!-- loginSession_[c]banner.jsp - ->
+    <Property key="Domain.JSPEntries.default">/custom/loginSession_cbanner.jsp</Property>
+    <Property key="Domain.Properties.banner.width">100%</Property>
+    <Property key="Domain.Properties.banner.style">border-bottom: 1px solid black;</Property>
+    <Property key="Domain.Properties.banner.imageSource">custom/Banner.jpg</Property>
+    <Property key="Domain.Properties.banner.imageWidth">860</Property>
+    <Property key="Domain.Properties.banner.imageHeight">120</Property>
+    <Property key="Domain.Properties.banner.imageLink"></Property>
+    <!- - -->
+
+    <!-- loginSession_wbanner.jsp - ->
+    <Property key="Domain.WebPages.JSP">wbanner</Property>
+    <Property key="Domain.JSPEntries.default">/custom/loginSession_wbanner.jsp</Property>
+    <!- - -->
+    <!-- Banner #1 - ->
+    <Property key="Domain.Properties.banner.imageSource">custom/Banner-1.png</Property>
+    <Property key="Domain.Properties.banner.imageWidth">600</Property>
+    <Property key="Domain.Properties.banner.imageHeight">80</Property>
+    <Property key="Domain.Properties.banner.imageLink"></Property>
+    <!- - -->
+    <!-- Banner #2 - >
+    <Property key="Domain.Properties.banner.imageSource_2">custom/Banner-2.png</Property>
+    <Property key="Domain.Properties.banner.imageWidth_2">440</Property>
+    <Property key="Domain.Properties.banner.imageHeight_2">80</Property>
+    <Property key="Domain.Properties.banner.imageLink_2"></Property>
+    <!- - -->
+
+    <!-- MapProvider -->
+    <!--
+    <Property key="Domain.MapProvider.active">openLayers</Property>
+    <Property key="Domain.MapProvider.key"></Property>
+    -->
+
+    <!-- ReverseGeocodeProvider -->
+    <!--
+    <Property key="Domain.ReverseGeocodeProvider.active">geonames</Property>
+    <Property key="Domain.ReverseGeocodeProvider.key"></Property>
+    -->
+    
+    <!-- Example to remove a specific web-page -->
+    <!--
+    <Property key="Domain.WebPages.RuleInfo">false</Property>
+    -->
+    
+    <!-- Example to remove a specific report -->
+    <!--
+    <Property key="Domain.Reports.GeozoneReport">false</Property>
+    -->
+
+</Include>
+
+<!-- ================================================================================= -->
+<!-- Example custom language Domain (this example sets the Spanish locale) -->
+<Include dir="private" file="private_common.xml" enabled="false">
+
+    <!-- Domain attributes -->
+    <Property key="Domain.name">spanish</Property>
+    <Property key="Domain.host">sp.example.com</Property>
+
+    <!-- Locale -->
+    <Property key="Domain.locale">es</Property>
+
+</Include>
+
+<!-- ================================================================================= -->
+<!-- Tablet Domain -->
+<Include dir="private" file="private_common.xml">
+
+    <!-- Domain attributes -->
+    <Property key="Domain.name">tablet</Property>
+    <Property key="Domain.host">tablet.example.com</Property>
+
+    <!-- Copyright -->
+    <!-- <Property key="Domain.Copyright">Copyright(C) GeoTelematic Solutions, Inc.</Property> -->
+
+    <!-- 'loginSession.jsp' -->
+    <!--
+    <Property key="Domain.Properties.login.showPoweredByOpenGTS">false</Property>
+    <Property key="Domain.Properties.login.showPiLink">true</Property>
+    <Property key="Domain.Properties.login.piLink">http://www.opengts.com</Property>
+    -->
+    <Property key="Domain.Properties.login.hideBannerAfterLogin">true</Property>
+
+    <!-- loginSession_[c]banner.jsp -->
+    <!--
+    <Property key="Domain.JSPEntries.default">/custom/loginSession_cbanner.jsp</Property>
+    <Property key="Domain.Properties.banner.width">100%</Property>
+    <Property key="Domain.Properties.banner.style">border-bottom: 1px solid black;</Property>
+    <Property key="Domain.Properties.banner.imageSource">custom/Banner.jpg</Property>
+    <Property key="Domain.Properties.banner.imageWidth">860</Property>
+    <Property key="Domain.Properties.banner.imageHeight">120</Property>
+    <Property key="Domain.Properties.banner.imageLink"></Property>
+    -->
+
+    <!-- MapProvider -->
+    <!--
+    <Property key="Domain.MapProvider.active">openLayers</Property>
+    <Property key="Domain.MapProvider.key"></Property>
+    -->
+    <Property key="Domain.MapProvider.map.fillFrame">true</Property>
+
+    <!-- ReverseGeocodeProvider -->
+    <!-- -->
+    <Property key="Domain.ReverseGeocodeProvider.active">googleV3</Property>
+<!--    <Property key="Domain.ReverseGeocodeProvider.key">AIzaSyBfs5okcK1La0AALunGF6uYJGhX5BMkWUA</Property>
+    <Property key="Domain.ReverseGeocodeProvider.key">AIzaSyAlSL3nHJaEPWfu10DEgD720RPLplFYU8M</Property> -->
+    <Property key="Domain.ReverseGeocodeProvider.key">AIzaSyAfrop4ZzXGz0fHZfW1ACQZTPwjkfeRL0g</Property>
+    <!-- -->
+
+</Include>
+
+<!-- ================================================================================= -->
+
+<!-- This example shows how to create a second 'Domain' which supports Spanish -->
+<!--
+<Include dir="private" file="private_common.xml">
+    <Property key="Domain.name">spanish</Property>
+    <Property key="Domain.host">es.example.com</Property>
+    <Property key="Domain.locale">es</Property>
+</Include>
+-->
+
+<!-- ================================================================================= -->
+
+</PrivateLabels>

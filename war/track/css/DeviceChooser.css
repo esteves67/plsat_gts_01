@@ -1,0 +1,154 @@
+
+/* device chooser DIV */
+DIV.devSelectorDiv {
+    max-height: 440px;
+    /* height: expression("240px"); */
+    height: expression( this.scrollHeight > 439 ? "440px" : "auto" );
+    overflow-y: auto; /* scroll */
+    overflow-x: hidden;
+    border: solid 1px black;
+    background-color: #FFFFFF;
+    left: 0px;
+    top: 0px;
+    position: absolute;
+    cursor: default;
+    z-Index: 30000;
+}
+DIV.devSelectorDiv_hidden {
+    visibility: collapse;
+    display: none;
+    height: 0px;
+}
+
+/* device table DIV */
+DIV.devSelectorTableList {
+    /* */
+}
+ 
+/* search input text field */
+INPUT.deviceChooserInput {
+    font: normal 11px Tahoma, Geneva, sans-serif;
+	background-color:#FFF;
+	border: 1px solid #cccccc;
+	-webkit-box-shadow:inset 0 1px 1px blue;
+	box-shadow:inset 0 1px 1px blue;
+	-webkit-transition:border linear 0.2s, box-shadow linear 0.2s;
+	transition:border linear 0.2s, box-shadow linear 0.2s;
+}
+
+/* device selector header row/col */
+TR.devSelectorRowHeader {
+	background-color: #000000;
+	color: #FFF;
+	height: 20px;
+}
+TH.devSelectorColHeader {
+    height: 12px;
+    font: bold 11px Tahoma, Geneva, sans-serif;
+    text-align: center;
+    border-bottom: 2px double black;
+}
+TH.devSelectorColHeaderX:hover {
+    height: 12px;
+    font: bold 8pt sans-serif; 
+    text-align: center;
+    border-bottom: 3px double #770000;
+    background-color: #CCCCCC;
+	height: 20px;
+}
+
+/* device selector data row */
+TR.devSelectorRowData {
+    background-color: #FFFFFF;
+    cursor: pointer;
+	height: 20px;
+	font-family:Tahoma, Geneva, sans-serif;
+	font-size:11px
+}
+TR.devSelectorRowData:hover {
+	background-color: #3366CC;
+	color:#FFF;
+	height: 20px;
+}
+TR.devSelectorRow_hidden {
+    visibility: collapse;
+    display: none;
+    height: 0px;
+}
+
+/* device selector data col */
+TD.devSelectorColData {
+    font: normal 8pt sans-serif; 
+    text-align: center; 
+    border-right: 1px solid #CCCCCC; 
+    border-bottom: 1px solid #CCCCCC; 
+}
+TD.devSelectorColData:hover {
+    background-color: #3366CC;
+	cursor: hand;
+	height: 20px;
+}
+TD.devSelectorCol_hidden {
+    visibility: collapse;
+    display: none;
+    height: 0px;
+}
+#selectDeviceFormDiv{
+	z-index: 1;
+	position:absolute;
+	top:36px;
+	left:90px;
+	width: 600px;
+}
+.selectDeviceFormTable{
+	font-family: "Source Sans Pro", Tahoma, Geneva;
+	font-size:9px;
+	background-color:#005B9F;
+	padding:5px;
+	border: 1px solid #FFF;
+	border-bottom-left-radius: 12px;
+	border-bottom-right-radius: 12px;
+	
+	
+}
+.selectorTitle{
+	font-family: "Source Sans Pro", Tahoma, Geneva;
+	font-size:12px;
+	color:#FFF;
+	padding-left: 10px;
+	padding-right: 10px;
+}
+.chooserStyle{
+	font-family: "Source Sans Pro", Tahoma, Geneva;
+	font-size: 10px;
+	color: #333;
+	height: 17px;
+	padding: 0px 0px 0px 3px;
+	margin: 0px 0px 0px 3px;
+	cursor: pointer;
+	border: 1px solid gray;
+}
+#mapAutoUpdateButton{
+	font-family: "Source Sans Pro", Tahoma, Geneva;
+	font-size: 11px;
+	color: #FFF;
+	padding-left: 6px;
+	padding-right: 6px;
+	padding-top: 1px;
+	padding-bottom: 1px;
+	border: 1px solid #FFF;
+	background-color: #003A66;
+	cursor: pointer;
+}
+#mapLastButton{
+	font-family: "Source Sans Pro", Tahoma, Geneva;
+	font-size: 11px;
+	color: #FFF;
+	padding-left: 6px;
+	padding-right: 6px;
+	padding-top: 1px;
+	padding-bottom: 1px;
+	border: 1px solid #FFF;
+	background-color: #003A66;
+	cursor: pointer;
+}

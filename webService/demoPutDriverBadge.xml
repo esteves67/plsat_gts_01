@@ -1,0 +1,11 @@
+<!-- 
+ === Request the to change a user password
+ -->
+<GTSRequest command="dbput">
+    <Authorization account="demo" user="admin" password=""/>
+    <Record table="Driver">
+        <Field name="accountID">demo</Field>
+        <Field name="driverID">smith</Field>
+        <Field name="badgeID">B12345</Field>
+    </Record>
+</GTSRequest>

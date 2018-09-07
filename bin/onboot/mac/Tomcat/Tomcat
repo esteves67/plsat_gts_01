@@ -1,0 +1,48 @@
+#!/bin/sh
+#
+# /Library/StartupItems/Tomcat/Tomcat
+#
+# A script to automatically start up Tomcat on system bootup for Mac OS X.
+#
+# The following should be appended to "/etc/hostconfig":
+#   TOMCAT=-YES-
+
+# Suppress the annoying "$1: unbound variable" error when no option was given
+if [ -z $1 ] ; then
+    echo "Usage: $0 [start|stop|restart] "
+    exit 1
+fi
+
+# Source the common setup functions for startup scripts
+test -r /etc/rc.common || exit 1
+. /etc/rc.common
+
+# Source runtime environment
+. /usr/local/opengts.env
+
+StartService ()
+{
+    if [ "${TOMCAT:=-NO-}" = "-YES-" ]; then
+        ConsoleMessage "Starting Tomcat Servlet/JSP Server ..."
+        cd /
+        sudo -u ${TOMCAT_USER} ${CATALINA_HOME}/bin/startup.sh
+    fi
+}
+
+StopService ()
+{
+    ConsoleMessage "Stoping Tomcat Servlet/JSP Server ... "
+    cd /
+    sudo -u ${TOMCAT_USER} ${CATALINA_HOME}/bin/shutdown.sh
+}
+
+RestartService ()
+{
+    ConsoleMessage "Restarting Tomcat Servlet/JSP Server... "
+    cd /
+    sudo -u ${TOMCAT_USER} ${CATALINA_HOME}/bin/startup.sh
+    sleep 5
+    sudo -u ${TOMCAT_USER} ${CATALINA_HOME}/bin/shutdown.sh
+}
+
+RunService "$1"

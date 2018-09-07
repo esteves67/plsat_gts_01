@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="http://service.war.extra.opengts.org" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="http://service.war.extra.opengts.org" xmlns:intf="http://service.war.extra.opengts.org" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+ <wsdl:types>
+  <schema elementFormDefault="qualified" targetNamespace="http://service.war.extra.opengts.org" xmlns="http://www.w3.org/2001/XMLSchema">
+   <element name="inputXML" type="xsd:string"/>
+   <element name="gtsServiceRequestReturn" type="xsd:string"/>
+  </schema>
+ </wsdl:types>
+   <wsdl:message name="gtsServiceRequestResponse">
+      <wsdl:part element="impl:gtsServiceRequestReturn" name="gtsServiceRequestReturn"/>
+   </wsdl:message>
+   <wsdl:message name="gtsServiceRequestRequest">
+      <wsdl:part element="impl:inputXML" name="inputXML"/>
+   </wsdl:message>
+   <wsdl:portType name="GTSService">
+      <wsdl:operation name="gtsServiceRequest" parameterOrder="inputXML">
+         <wsdl:input message="impl:gtsServiceRequestRequest" name="gtsServiceRequestRequest"/>
+         <wsdl:output message="impl:gtsServiceRequestResponse" name="gtsServiceRequestResponse"/>
+      </wsdl:operation>
+   </wsdl:portType>
+   <wsdl:binding name="GTSServiceSoapBinding" type="impl:GTSService">
+      <wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+      <wsdl:operation name="gtsServiceRequest">
+         <wsdlsoap:operation soapAction=""/>
+         <wsdl:input name="gtsServiceRequestRequest">
+            <wsdlsoap:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output name="gtsServiceRequestResponse">
+            <wsdlsoap:body use="literal"/>
+         </wsdl:output>
+      </wsdl:operation>
+   </wsdl:binding>
+   <wsdl:service name="GTSServiceService">
+      <wsdl:port binding="impl:GTSServiceSoapBinding" name="GTSService">
+         <wsdlsoap:address location="http://localhost:8080/track/Service"/>
+      </wsdl:port>
+   </wsdl:service>
+</wsdl:definitions>

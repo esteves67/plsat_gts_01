@@ -1,0 +1,7 @@
+<!-- 
+ === Request a list of all available map pushpins
+ -->
+<GTSRequest command="pushpins">
+    <Authorization account="demo" user="admin" password=""/>
+</GTSRequest>
+

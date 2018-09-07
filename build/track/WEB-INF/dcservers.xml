@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no' ?>
+<!DOCTYPE DCServerConfig SYSTEM "dcservers.dtd" >
+
+<DCServerConfig
+    bindAddress="${DCServerConfig.bindAddress=}"
+    backlog="${DCServerConfig.backlog=}"
+    includeDir="dcservers"
+    >
+
+    <!-- ================================================================================
+     === Notes:
+     ===    - Not all servers will be present in this release
+     ===    - Duplicate server name entries are ignored
+     === ================================================================================ 
+     -->
+
+    <!-- [optional] Miscellaneous DCServers -->
+    <Include file="dcserver_*.xml" optional="true"/>
+
+    <!-- ================================================================================ -->
+
+    <!-- standard DCServer definitions (duplicates will be ignored) -->
+    <Include file="dcservers_release.xml" optional="true"/>
+
+    <!-- ================================================================================ -->
+
+</DCServerConfig>
+

@@ -1,0 +1,11 @@
+#!/bin/bash
+# -----------------------------------------------------------------------------
+# --- Restart Tomcat
+# - To force Tomcat to restart daily, this file should be placed in
+# - "/etc/cron.daily", owned by 'root', with permissions 755.
+# -----------------------------------------------------------------------------
+# 
+/sbin/service tomcat stop
+/bin/sleep 5
+/sbin/service tomcat start
+#

@@ -1,0 +1,8 @@
+<!-- 
+ === Return the database schema for the Device table
+ -->
+<GTSRequest command="dbschema">
+    <Authorization account="demo" user="admin" password=""/>
+    <TableSchema table=""/> <!-- a blank table specification implies all tables -->
+</GTSRequest>
+

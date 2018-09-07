@@ -1,0 +1,27 @@
+# ---------------------------------------------------------------------------
+# This modules is 'sourced' by bin/startServers.sh
+# ---------------------------------------------------------------------------
+# --- Custom Device Communication Server (DCS) startup commands
+SERVER_DEBUG_ARG="" # "-debugMode"
+CRONTAB_DIR="${GTS_HOME}/crontab"
+#
+# --- DCS modules available in OpenGTS
+#execServer "Sanav GC-101"        "sanav"         "${option}"  "${SERVER_DEBUG_ARG}"
+#execServer "Aspicore"            "aspicore"      "${option}"  "${SERVER_DEBUG_ARG}"
+#execServer "TK102/TK103"         "tk10x"         "${option}"  "${SERVER_DEBUG_ARG}"
+#execServer "SIPGEAR"             "sipgear"       "${option}"  "${SERVER_DEBUG_ARG}"
+#execServer "TAIP"                "taip"          "${option}"  "${SERVER_DEBUG_ARG}"
+#execServer "ICare"               "icare"         "${option}"  "${SERVER_DEBUG_ARG}"
+#
+# --- OpenDMTP DCS module (only needed if using an OpenDMTP compliant device)
+#execServer "GTS OpenDMTP"        "gtsdmtp"       "${option}"  "${SERVER_DEBUG_ARG}"
+#
+# --- Default basoc GTS Enterprise Rule Factory Lite 'Cron' handler
+#execServer "Periodic Service"    "cron"          "${option}"  "-crontab=${CRONTAB_DIR}/cronRuleFactoryLite.xml"
+#
+# --- Event Notification Rules Engine 'Cron' handler
+#execServer "Periodic Service"    "cron"          "${option}"  "-crontab=${CRONTAB_DIR}/maintkm.xml"
+execServer "Periodic Service"     "cron"          "${option}"  "-crontab=${CRONTAB_DIR}/crontab.xml"
+#
+# --- Additional DCS modules
+#

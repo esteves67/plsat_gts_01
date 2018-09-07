@@ -1,0 +1,54 @@
+<!-- Crontab 
+<Crontab 
+    timeZone="US/Pacific"   == timezone used for Job 'When' specification
+    interval="60"           == periodic interval for checking Job 'When' triggers (in seconds)
+    autoReload="false"      == if "true", the crontab xml file will be reloaded if changed
+    threadPoolSize="1"      == the maximum size of the thread pool
+    >
+    <Job 
+        name="LS"           == name of Job
+        thread="true"       == run in thread
+        active="false"      == "true" to process job, "false" to ignore
+        >
+        <Title>Job Title</Title>                    == printed Job title
+        <Classpath>path_1;path_2;etc</Classpath>    == ';' separated classpath
+        <Class>some.classname</Class>               == class name
+        <Method>cron</Method>                       == method name
+        <Arg>arg1</Arg>                             == String argument #1
+        <Arg>arg2</Arg>                             == String argument #2
+        <When                                       
+            monthDay="1"                            == day of month  ["1" is first day of month]
+            weekDay="sun"                           == day of week   ["sun" is Sunday]
+            hour="*/2"                              == hour [0..23]  ["*/2" is every even hour]
+            minute="*/15"                           == minute [0..59] ["*/15" is every 15 minutes
+            />                                      == also: */15 */2 * 1 sun
+    </Job>
+</Crontab>
+-->
+<!-- 
+ === All job execution is serialize through a single thread (ie. threadPoolSize="1")
+ ===   timeZone="system"        use default system timezone for Job 'When' specification
+ ===   interval="60"            periodic interval for checking Job 'When' triggers (in seconds)
+ ===   autoReload="false"       if "true", the crontab xml file will be reloaded if changed
+ ===   threadPoolSize="1"       the maximum size of the thread pool
+ -->
+<Crontab 
+    timeZone="system"
+    interval="60"
+    autoReload="false"
+    threadPoolSize="1"
+    >
+
+  <!--
+   === Example executing "RuleFactoryLite -account=ALL" at the top of each hour
+   -->
+  <Job name="CronRuleFactoryLite" active="true">
+     <Class>org.opengts.extra.rule.RuleFactoryLite</Class>
+     <Method>cron</Method>
+     <Arg>-debugMode</Arg>
+     <Arg>-account=ALL</Arg>
+     <Arg>-selector=cron</Arg>
+     <When hour="*" minute="0"/>
+  </Job>
+
+</Crontab>

@@ -1,0 +1,6 @@
+<!-- 
+ === Request a list of web-service error/warning response codes/messages
+ -->
+<GTSRequest command="messages">
+    <Authorization account="demo" user="admin" password=""/>
+</GTSRequest>

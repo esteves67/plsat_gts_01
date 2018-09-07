@@ -1,0 +1,7 @@
+<!-- 
+ === Requests the current version of the GTS Installation
+ -->
+<GTSRequest command="version">
+    <Authorization account="demo" user="admin" password=""/>
+</GTSRequest>
+

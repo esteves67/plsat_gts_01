@@ -1,0 +1,47 @@
+# -----------------------------------------------------------------------------
+# Project: OpenGTS - Open GPS Tracking System
+# URL    : http://www.opengts.org
+# File   : serverList
+# -----------------------------------------------------------------------------
+# This file is sourced by the script 'startServers.sh', and should contain startup
+# commands in the following format:
+#   execServer "Server Description" "server"   "${option}"   "-option=someOptionHere" 
+# -----------------------------------------------------------------------------
+# Uncomment the device communication servers that you wish to have started by 'startServers.sh'.
+# The server jar file must exist in "build/lib/" before the server can be started successfully.
+# -----------------------------------------------------------------------------
+#DEBUG_MODE=1
+CRONTAB_DIR="${GTS_HOME}/crontab"
+# -----------------------------------------------------------------------------
+
+# --- GTS OpenDMTP server
+#execServer "GTS OpenDMTP"              "gtsdmtp"   "${option}"  ""
+
+# --- Example 'template' server
+#execServer "Example 'template'"        "template"  "${option}"  ""
+
+# --- I-Care G3300 server
+#execServer "I-Care G3300"              "icare"     "${option}"  ""
+
+# -----------------------------------------------------------------------------
+
+# --- Crontab manager
+#execServer "Cron Scheduler"            "cron"      "${option}"  "-crontab=${CRONTAB_DIR}/crontab.xml" 
+#execServer "Cron Scheduler"            "cron"      "${option}"  "-crontab=${CRONTAB_DIR}/maintkm.xml" 
+
+# --- Sanav GC-101 UDP server
+#execServer "Sanav GC-101"              "sanav"     "${option}"  ""
+
+# --- Enfora server
+#execServer "Enfora"                    "enfora"    "${option}"  "" 
+
+# --- CalAmp LMU-1500
+#execServer "CalAmp LMU"                "calamp"    "${option}"  "" 
+
+# --- LaiPac S-911/StarFinder server
+#execServer "Laipac S-911/Starfinder"   "laipac"    "${option}"  ""
+
+# --- Wonde Proud SPT100 server
+#execServer "Wonde Proud SPT100"        "wonde"     "${option}"  ""
+
+# ---

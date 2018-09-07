@@ -1,0 +1,11 @@
+{
+    Description     = "Tomcat Servlet/JSP Server";
+    Provides        = ("Tomcat");
+    Requires        = ("Resolver");
+    OrderPreference = "None";
+    Messages =
+    {
+        start = "Starting Tomcat Servlet/JSP Server... ";
+        stop  = "Stopping Tomcat Servlet/JSP Server... ";
+    };
+}

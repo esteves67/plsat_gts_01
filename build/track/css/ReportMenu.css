@@ -1,0 +1,18 @@
+
+/* Report menu */
+SPAN.reportRadioButton { 
+	color: #FFF;
+    padding-left: 7px; 
+    padding-right: 10px; 
+}
+
+INPUT.reportRadioButton { 
+	color: #FFF;
+    margin-bottom:7px;
+}
+
+SPAN.reportRadioOption { 
+    padding-left: 0px; 
+}
+
+

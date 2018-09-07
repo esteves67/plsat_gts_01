@@ -1,0 +1,12 @@
+<!-- Crontab -->
+<Crontab timeZone="US/Pacific" autoReload="false">
+
+  <Job name="BorderCrossing" process="thread">
+     <Class>org.opengts.bcross.tables.BorderCrossing</Class>
+     <Method>cron</Method>
+     <Arg>-account=ALL</Arg>
+     <!-- everyday at midnight -->
+     <When hour="0" minute="0"/>
+  </Job>
+
+</Crontab>

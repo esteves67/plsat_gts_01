@@ -1,0 +1,136 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no' ?>
+<!DOCTYPE DCServerConfig SYSTEM "dcservers.dtd" >
+
+<!-- 
+  =======================================================================================
+  GTS Enterprise Device Communication Server configuration file
+  Copyright 2007-2012 GeoTelematic Solutions, Inc.
+  =======================================================================================
+-->
+
+<DCServerConfig>
+
+    <!-- ================================================================================ -->
+    <DCServer name="gtsdmtp">
+    
+        <!--
+         === DCS Description
+         -->
+        <Description><![CDATA[
+            OpenDMTP
+            ]]></Description>
+
+        <!--
+         === DCS Attributes
+         -->
+        <Attributes><![CDATA[
+            jarOptional=false
+            hasInputs=true
+            hasOutputs=true
+            transmitSms=false
+            transmitUdp=true
+            transmitTcp=true
+            transmitSat=false
+            commandSms=false
+            commandUdp=false
+            commandTcp=false
+            ]]></Attributes>
+
+        <!-- 
+         === Listen ports
+         -->
+        <ListenPorts 
+            tcpPort="37100,37200" 
+            udpPort="37100,37200"
+            />
+            
+        <!--
+         === DCS runtime properties
+         -->
+        <Properties>
+
+            <Property key="simulateGeozones">false</Property>
+            <!--
+             === "simulateGeozones" - If true, the DCS will check for geozone arrivals/departures
+             === and insert the appropriate arrive/depart events.
+             -->
+
+            <Property key="customEvent.55">1|H|0|2 2|H|0|4 6|H|0|8 8|H|0|2 9|H|0|2 10|H|0|3 11|H|0|3 12|H|0|4 93|H|0|2 88|H|0|2 82|H|0|4 4|H|0|1</Property>
+            <!--
+             === "customEvent.XX" - This defines a custom packet for packet-type XX (specified in hex)
+             === Each space-delimited entry defines a field within the custom packet.
+             === The format of the field definition is as follows:
+             ===    <type>|H/L|<index>|<length>
+             ===    <type>    The defined field type
+             ===    H/L       "H" high resolution, "L" low resolution
+             ===    <index>   The field sub-index (usually '0')
+             ===    <length>  The field byte-length
+             === The field types are described below:
+             ===    Description                Type  Low-res                          High-res
+             ===    FIELD_STATUS_CODE            1   
+             ===    FIELD_TIMESTAMP              2   
+             ===    FIELD_INDEX                  3   
+             ===    FIELD_SEQUENCE               4   
+             ===    FIELD_GPS_POINT              6   
+             ===    FIELD_GPS_AGE                7   %2u 0 to 65535 sec
+             ===    FIELD_SPEED                  8   
+             ===    FIELD_HEADING                9   
+             ===    FIELD_ALTITUDE              10   
+             ===    FIELD_DISTANCE              11   
+             ===    FIELD_ODOMETER              12   
+             ===    FIELD_GEOFENCE_ID           14   %4u 0x00000000 to 0xFFFFFFFF
+             ===    FIELD_TOP_SPEED             15   %1u 0 to 255 kph                 %2u 0.0 to 655.3 kph
+             ===    FIELD_BRAKE_G_FORCE         16   %1u 0.0 to 25.5 G                %2u 0.0 to 655.3 G
+             ===    FIELD_STRING                17   %*s may contain only 'A'..'Z', 'a'..'z, '0'..'9', '-', '.'
+             ===    FIELD_STRING_PAD            18   %*s may contain only 'A'..'Z', 'a'..'z, '0'..'9', '-', '.'
+             ===    FIELD_ENTITY                21   %*s may contain only 'A'..'Z', 'a'..'z, '0'..'9', '-', '.' 
+             ===    FIELD_ENTITY_PAD            22   %*s may contain only 'A'..'Z', 'a'..'z, '0'..'9', '-', '.' 
+             ===    FIELD_BINARY                26   %*b  
+             ===    FIELD_INPUT_ID              33   %4u 0x00000000 to 0xFFFFFFFF
+             ===    FIELD_INPUT_STATE           34   %4u 0x00000000 to 0xFFFFFFFF
+             ===    FIELD_OUTPUT_ID             36   %4u 0x00000000 to 0xFFFFFFFF
+             ===    FIELD_OUTPUT_STATE          37   %4u 0x00000000 to 0xFFFFFFFF
+             ===    FIELD_ELAPSED_TIME          39   %3u 0 to 16777216 sec            %4u 0.000 to 4294967.295 sec
+             ===    FIELD_COUNTER               40   %4u 0 to 4294967295
+             ===    FIELD_SENSOR32_LOW          49   %4u 0x00000000 to 0xFFFFFFFF
+             ===    FIELD_SENSOR32_HIGH         50   %4u 0x00000000 to 0xFFFFFFFF
+             ===    FIELD_SENSOR32_AVER         51   %4u 0x00000000 to 0xFFFFFFFF
+             ===    FIELD_TEMP_LOW              58   %1i -126 to +126 C               %2i -3276.6 to +3276.6 C
+             ===    FIELD_TEMP_HIGH             59   %1i -126 to +126 C               %2i -3276.6 to +3276.6 C
+             ===    FIELD_TEMP_AVER             60   %1i -126 to +126 C               %2i -3276.6 to +3276.6 C
+             ===    FIELD_GPS_DGPS_UPDATE       65   %2u 0 to 65535 sec
+             ===    FIELD_GPS_HORZ_ACCURACY     66   %1u 0 to 255 m                   %2u 0.0 to 6553.5 m
+             ===    FIELD_GPS_VERT_ACCURACY     67   %1u 0 to 255 m                   %2u 0.0 to 6553.5 m
+             ===    FIELD_GPS_SATELLITES        68   %1u 0 to 12
+             ===    FIELD_GPS_MAG_VARIATION     69   %2i -180.00 to 180.00 deg
+             ===    FIELD_GPS_QUALITY           70   %1u (0=None, 1=GPS, 2=DGPS, ...)
+             ===    FIELD_GPS_TYPE              71   %1u (1=None, 2=2D, 3=3D, ...)
+             ===    FIELD_GPS_GEOID_HEIGHT      72   %1i -128 to +127 m               %2i -3276.7 to +3276.7 m
+             ===    FIELD_GPS_PDOP              73   %1u 0.0 to 25.5                  %2u 0.0 to 99.9
+             ===    FIELD_GPS_HDOP              74   %1u 0.0 to 25.5                  %2u 0.0 to 99.9
+             ===    FIELD_GPS_VDOP              75   %1u 0.0 to 25.5                  %2u 0.0 to 99.9
+             ===    FIELD_OBC_VALUE             80   %*b (at least 4 bytes, includes mid/pid)
+             ===    FIELD_OBC_GENERIC           81   %4u
+             ===    FIELD_OBC_J1708_FAULT       82   %4u
+             ===    FIELD_OBC_DISTANCE          84   %3u 0 to 16777216 km             %4u 0.0 to 429496729.5 km
+             ===    FIELD_OBC_ENGINE_HOURS      87   %3u 0 to 1677721.6 hours
+             ===    FIELD_OBC_ENGINE_RPM        88   %2u 0 to 65535 rpm
+             ===    FIELD_OBC_COOLANT_TEMP      89   %1i -126 to +126 C               %2i -3276.7 to +3276.7 C
+             ===    FIELD_OBC_COOLANT_LEVEL     90   %1u 0% to 100% percent           %2u 0.0% to 100.0% percent
+             ===    FIELD_OBC_OIL_LEVEL         91   %1u 0% to 100% percent           %2u 0.0% to 100.0% percent
+             ===    FIELD_OBC_OIL_PRESSURE      92   %1u 0 to 255 kPa                 %2u 0.0 to 6553.5 kPa
+             ===    FIELD_OBC_FUEL_LEVEL        93   %1u 0% to 100% percent           %2u 0.0% to 100.0% percent
+             ===    FIELD_OBC_FUEL_ECONOMY      94   %2u 0.0 to 6553.5 kpg
+             ===    FIELD_OBC_FUEL_TOTAL        95   %3u 0 to 16777216 liters         %4u 0.0 to 429496729.5 liters
+             ===    FIELD_OBC_FUEL_IDLE         96   %3u 0 to 16777216 liters         %4u 0.0 to 429496729.5 liters
+             -->
+
+            <Property key="firstSessionNegotiation">true</Property>
+            <Property key="udpReturnResponse">true</Property>
+
+            </Properties>
+
+    </DCServer>
+
+</DCServerConfig>
+

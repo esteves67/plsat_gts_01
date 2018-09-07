@@ -1,0 +1,240 @@
+<!-- 
+ === Copyright 2007-2012 Geotelematic Solutions, Inc.
+ === ==========================================================================
+ === Crontab example
+  <Crontab 
+     timeZone="US/Pacific"   == timezone used for Job 'When' specification
+     interval="60"           == periodic interval for checking Job 'When' triggers (in seconds)
+     autoReload="false"      == if "true", the crontab xml file will be reloaded if changed
+     threadPoolSize="1"      == the maximum size of the thread pool
+     >
+     <Job 
+        name="LS"           == name of Job
+        thread="true"       == run in thread
+        active="false"      == "true" to process job, "false" to ignore
+        >
+        <Title>Job Title</Title>                    == printed Job title
+        <Classpath>path_1;path_2;etc</Classpath>    == ';' separated classpath
+        <Class>some.classname</Class>               == class name
+        <Method>cron</Method>                       == method name
+        <Arg>arg1</Arg>                             == String argument #1
+        <Arg>arg2</Arg>                             == String argument #2
+        <When                                       
+            monthDay="1"                            == day of month  ["1" is first day of month]
+            weekDay="sun"                           == day of week   ["sun" is Sunday]
+            hour="*/2"                              == hour [0..23]  ["*/2" is every even hour]
+            minute="*/15"                           == minute [0..59] ["*/15" is every 15 minutes
+            />                                      == also: */15 */2 * 1 sun
+     </Job>
+  </Crontab>
+ === ==========================================================================
+ -->
+
+<!-- 
+ === ==========================================================================
+ === All job execution is serialize through a single thread (ie. threadPoolSize="1")
+ ===   timeZone="system"        use default system timezone for Job 'When' specification
+ ===   interval="60"            periodic interval for checking Job 'When' triggers (in seconds)
+ ===   autoReload="false"       if "true", the crontab xml file will be reloaded if changed
+ ===   threadPoolSize="1"       the maximum size of the thread pool
+ === ==========================================================================
+ === The following runtime config properties may be specified to override
+ === specific attributes within this file:
+ ===    - Crontab.stopOnError=[true|false]
+ ===    - Crontab.autoReload=[true|false]
+ ===    - Crontab.threadPoolSize=<Size>
+ ===    - Crontab.interval=<Seconds>
+ ===    - Crontab.timezone=[system|<Timezone>]
+ ===    - Crontab.<JobName>.active=[true|false]
+ ===    - Crontab.<JobName>.thread=[true|false]
+ === ==========================================================================
+ -->
+<Crontab 
+    timeZone="system"
+    interval="60"
+    autoReload="false"
+    threadPoolSize="1"
+    >
+    
+    <!--
+     === NOTES: 
+     ===    - Inactive (ie. 'active="false"') Jobs will be ignored!
+     ===      A Job specified as inactive in this file can be made active by specifying
+     ===      the following runtime config property in one of the '.conf' files:
+     ===        Crontab.<JobName>.active=true
+     ===      Where "<JobName>" is the name of the Job to make active.
+     ===    - When adding new daily jobs to this file, it is recommended that the start
+     ===      time for jobs be offset from other jobs, at least by a few minutes.  This
+     ===      prevents many cron tasks from starting all at the same time and creating
+     ===      an excessive load on the server.
+     -->
+
+    <!-- ============================================================================ -->
+
+    <!--
+     === Name: PeriodicMaintenance
+     === Exec: RuleCron -account=ALL -device=ALL -rule=maintkm
+     -->
+    <!--
+    <Job name="PeriodicMaintenance" active="true">
+        <Class>org.opengts.rule.RuleCron</Class>
+        <Method>cron</Method>
+        <Arg>-account=ALL</Arg>
+        <Arg>-device=ALL</Arg>
+        <Arg>-rule=maintkm</Arg>
+        <When hour="01" minute="05"/>
+    </Job>
+    -->
+
+    <!--
+     === Name: 5MinuteCron
+     === Exec: RuleCron -tag=5min -rule=ALL -account=ALL -device=ALL
+     -->
+    <Job name="5MinuteCron" active="true">
+        <Class>org.opengts.rule.RuleCron</Class>
+        <Method>cron</Method>
+        <Arg>-debugMode</Arg>
+        <Arg>-account=ALL</Arg>
+        <Arg>-device=ALL</Arg>
+        <Arg>-rule=ALL</Arg>
+        <Arg>-tag=5min</Arg>
+        <When hour="*" minute="*/5"/>
+    </Job>
+
+    <!--
+     === Name: 15MinuteCron
+     === Exec: RuleCron -tag=15min -rule=ALL -account=ALL -device=ALL
+     -->
+    <Job name="15MinuteCron" active="true">
+        <Class>org.opengts.rule.RuleCron</Class>
+        <Method>cron</Method>
+        <Arg>-debugMode</Arg>
+        <Arg>-account=ALL</Arg>
+        <Arg>-device=ALL</Arg>
+        <Arg>-rule=ALL</Arg>
+        <Arg>-tag=15min</Arg>
+        <When hour="*" minute="*/15"/>
+    </Job>
+
+    <!--
+     === Name: 30MinuteCron
+     === Exec: RuleCron -tag=30min -rule=ALL -account=ALL -device=ALL
+     -->
+    <Job name="30MinuteCron" active="true">
+        <Class>org.opengts.rule.RuleCron</Class>
+        <Method>cron</Method>
+        <Arg>-debugMode</Arg>
+        <Arg>-account=ALL</Arg>
+        <Arg>-device=ALL</Arg>
+        <Arg>-rule=ALL</Arg>
+        <Arg>-tag=30min</Arg>
+        <When hour="*" minute="*/30"/>
+    </Job>
+
+    <!--
+     === Name: HourlyCron
+     === Exec: RuleCron -tag=hourly -rule=ALL -account=ALL -device=ALL
+     -->
+    <Job name="HourlyCron" active="true">
+        <Class>org.opengts.rule.RuleCron</Class>
+        <Method>cron</Method>
+        <Arg>-debugMode</Arg>
+        <Arg>-account=ALL</Arg>
+        <Arg>-device=ALL</Arg>
+        <Arg>-rule=ALL</Arg>
+        <Arg>-tag=hourly</Arg>
+        <When hour="*" minute="00"/>
+    </Job>
+
+    <!--
+     === Name: DailyCron
+     === Exec: RuleCron -tag=daily -rule=ALL -account=ALL -device=ALL
+     -->
+    <Job name="DailyCron" active="true">
+        <Class>org.opengts.rule.RuleCron</Class>
+        <Method>cron</Method>
+        <Arg>-debugMode</Arg>
+        <Arg>-account=ALL</Arg>
+        <Arg>-device=ALL</Arg>
+        <Arg>-rule=ALL</Arg>
+        <Arg>-tag=daily</Arg>
+        <When hour="01" minute="05"/>
+    </Job>
+
+    <!--
+     === Name: WeeklyCron
+     === Exec: RuleCron -tag=weekly -rule=ALL -account=ALL -device=ALL
+     -->
+    <Job name="WeeklyCron" active="true">
+        <Class>org.opengts.rule.RuleCron</Class>
+        <Method>cron</Method>
+        <Arg>-debugMode</Arg>
+        <Arg>-account=ALL</Arg>
+        <Arg>-device=ALL</Arg>
+        <Arg>-rule=ALL</Arg>
+        <Arg>-tag=weekly</Arg>
+        <When weekDay="sun" hour="01" minute="37"/>
+    </Job>
+
+    <!--
+     === Name: MonthlyCron
+     === Exec: RuleCron -tag=monthly -rule=ALL -account=ALL -device=ALL
+     -->
+    <Job name="MonthlyCron" active="true">
+        <Class>org.opengts.rule.RuleCron</Class>
+        <Method>cron</Method>
+        <Arg>-debugMode</Arg>
+        <Arg>-account=ALL</Arg>
+        <Arg>-device=ALL</Arg>
+        <Arg>-rule=ALL</Arg>
+        <Arg>-tag=monthly</Arg>
+        <When monthDay="1" hour="2" minute="17"/>
+    </Job>
+
+    <!-- ============================================================================ -->
+
+    <!--
+     === Name: BorderCrossing
+     === Exec: BorderCrossing -account=ALL
+     === Prop: Crontab.BorderCrossing.active=true
+     -->
+    <Job name="BorderCrossing" active="false">
+        <Class>org.opengts.bcross.tables.BorderCrossing</Class>
+        <Method>cron</Method>
+        <Arg>-account=ALL</Arg>
+        <When hour="2" minute="0"/> <!-- everyday at 2am -->
+    </Job>
+
+    <!-- ============================================================================ -->
+
+    <!-- EXPERIMENTAL
+     === Name: PeriodicReports_demo
+     === Exec: ServiceClient -file=${GTS_HOME}/webService/emailReports_demo.xml
+     === Note: Requires that "GTSRequest.url" property is defined.
+     === This feature is currently only designed to send periodic reports to a single
+     === specific account.
+     === ======================================================================
+     === To enable your own periodic report, following the following steps:
+     ===  1) Set the following property in your "config.conf" file:
+     ===       GTSRequest.url=http://localhost:8080/track/Service
+     ===     Set the domain name and port to match your server location
+     ===  2) Copy the following "Job" tag section and rename "PeriodicReports_demo"
+     ===     to "PeriodicReports_otheracount" for the account that you wish to
+     ===     receive periodic reports.
+     ===  3) Rename the "emailReports_demo" to "emailReports_otheraccount" to match
+     ===     the account that you wish to receive periodic reports.
+     ===  4) Create a copy of the "emailReports_demo.xml" as "emailReports_otheraccount.xml"
+     ===     and modify the file accordingly for the reports you wish your account
+     ===     to receive.
+     === ======================================================================
+     === NOTE: Since this is still experimental, full support for this feature is
+     === not yet available.
+     -->
+    <Job name="PeriodicReports_demo" active="false">
+        <Class>org.opengts.extra.service.ServiceClient</Class>
+        <Method>cron</Method>
+        <Arg>-file=${GTS_HOME}/webService/emailReports_demo.xml</Arg>
+        <When hour="3" minute="0"/>  <!-- everyday at 3am -->
+    </Job>
+
+</Crontab>

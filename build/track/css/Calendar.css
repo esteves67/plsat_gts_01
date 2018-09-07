@@ -1,0 +1,252 @@
+@import url(http://fonts.googleapis.com/css?family=Open+Sans:400,700,300);
+@import url(http://fonts.googleapis.com/css?family=Quicksand:400);
+@import url(http://fonts.googleapis.com/css?family=Open+Sans+Condensed:300,700);
+@import url(//fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600,700,900,200italic,300italic,400italic,600italic,700italic,900italic|Dosis:200,300,400,500,600,700,800|Lato:100,300,400,700,900,100italic,300italic,400italic,700italic,900italic);
+
+/* DIV: The Div element containing the Calendar table(s) */
+DIV.calDiv {
+    width: 145px;
+}
+
+/* TABLE: The table containing the entire Calendar */
+TABLE.calTable {
+    width: 100%;
+    background-color: #FFF; 
+    
+}
+
+/* TD: The cell containing the title/date/time table 'calTitleTable' */
+TD.calTitleDateCell {
+    width: 100%; 
+    font-size: 9pt;
+    border-bottom-style: solid; 
+    border-width: 1px; 
+    border-color: #AAAAAA; 
+}
+
+/* TABLE: The table containing the "title", date and time */
+TABLE.calTitleTable {
+    width: 100%;
+    background-color: #FFFFFF; 
+    border-width: 0px; 
+}
+
+/* TD: The title cell in the title table */
+TD.calTitleFieldExpanded { 
+    width: 100%;
+    /* height: 12px; */
+    /* overflow-y: hidden; */
+    font-family: sans-serif;
+    font-size: 8pt;
+    font-weight: bold;
+    text-align: left;
+    padding-left: 2px;
+    /*cursor: pointer;*/
+}
+TD.calTitleFieldCollapsed { 
+    width: 100%;
+    font-family: sans-serif;
+    font-size: 8pt;
+    font-weight: bold;
+    color: #1111BB;
+    text-align: left;
+    padding-left: 2px;
+    cursor: pointer;
+}
+
+/* TD: The date/time cell in the title table */
+TD.calDateTimeFieldExpanded { 
+    /* height: 12px; */
+    font-family: sans-serif; 
+    font-size: 8pt; 
+    padding-right: 1px;
+    /*cursor: pointer;*/
+}
+TD.calDateTimeFieldCollapsed { 
+    font-family: sans-serif; 
+    font-size: 8pt; 
+    padding-right: 1px;
+    color: #1111BB;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* SPAN: The date/time field in the 'calDateTimeField' cell */
+SPAN.calDateField { 
+    /*cursor: pointer; */
+}
+
+/* The time field in the 'calDateTimeField' cell */
+.calTimeFieldExpandedColon { 
+    /* height: 12; */
+    font-family: sans-serif; 
+    font-size: 8pt; 
+    color: blue;
+    text-decoration: none;
+    cursor: pointer; 
+}
+.calTimeFieldExpanded { 
+    /* height: 12;  */
+    font-family: sans-serif; 
+    font-size: 8pt; 
+    color: blue;
+    text-decoration: none; /* underline; */
+    cursor: pointer; 
+}
+.calTimeFieldExpanded:hover {
+	color: #0C3;
+}
+.calTimeFieldCollapsed { 
+    color: #1111BB;
+    text-decoration: none;
+    cursor: pointer; 
+}
+
+/* SPAN: The time field in the 'calDateTimeField' cell */
+.calTimeFieldDisabled { 
+    color: black;
+    text-decoration: none;
+}
+
+/* TABLE: The table containing the Month name and previous/next links #D5D5F6*/
+TABLE.calMonthHeaderTable {
+	background-color: #006699;
+	color:#FFF;
+	height: 16px;
+}
+
+/* TD: The cell containing the previous/next month links */
+TD.calMonthAdvance { 
+    font-family: sans-serif; 
+    font-size: 9pt; 
+	color:#FFF;
+	cursor: hand;
+	background-color:#003A66;
+}
+.calMonthAdvance a:link, .calMonthAdvance a:active, .calMonthAdvance a:visited{
+	color: #005B9F;
+	border: 1px thin #FFF;
+}
+
+/* TD: The cell containing the month name/abbreviation */
+TD.calMonthName { 
+    font-family: "Source Sans Pro", Tahoma, Geneva;
+	font-size: 12px;
+	text-rendering: optimizelegibility; 
+	background-color:#003A66;
+	color:#FFF;
+}
+
+/* TD: The Calendar table (calTable) cell which contains the month days table */
+TD.calMonthDaysCell {
+	width: 100%;
+	font-family: sans-serif;
+	font-size: 7pt;
+	text-align: center;
+	background-color: #00CCFF;
+	color: #000000;
+}
+
+/* TABLE: The table containing the day-of-week header and month days */
+TABLE.calMonthDaysTable {
+    width: 100%;
+    background-color: #DDDDDD; 
+    border: solid #DDDDDD 1px; 
+}
+
+/* TD: The cell containing the days-of-week header */
+TD.calMonthDOW {
+	font-family: "Source Sans Pro", Tahoma, Geneva;
+	font-size: 11px;
+	text-rendering: optimizelegibility; 
+	width: 18px;
+	text-align: center;
+	background-color: #003A66;
+	color: #FFFFFF;
+	border-top-style: solid;
+	border-bottom-style: solid;
+	border-width: 1px;
+	border-color: #555555;
+}
+
+/* TD: The cell containing the previous month days */
+TD.calPrevMonthDays {
+	font-family: "Source Sans Pro", Tahoma, Geneva;
+	font-size: 11px;
+	text-rendering: optimizelegibility;
+	text-align: center;
+	background-color: #FFFFFF;
+	color: #FFF;
+}
+
+/* TD: The cell containing the next month days */
+TD.calNextMonthDays {
+	font-family: "Source Sans Pro", Tahoma, Geneva;
+	font-size: 5px;
+	text-rendering: optimizelegibility;
+	text-align: center;
+	background-color: #FFFFFF;
+	color: #FFF;
+}
+
+/* TD: The cell containing the current month days, when enabled */
+TD.calThisMonthDaysEnabled {
+	font-family: "Source Sans Pro", Tahoma, Geneva;
+	font-size: 11px;
+	text-rendering: optimizelegibility;
+	text-align: center;
+	background-color: #FFF;
+	color: #000;
+	cursor: pointer;/*
+	border-bottom-style:inset;
+	border-right-style: solid;
+	border-width: 1px;
+	border-color: #BBBBBB;*/
+}
+
+TD.calSelectedDay {
+	font-family: "Source Sans Pro", Tahoma, Geneva;
+	font-size: 10px;
+	text-align: center;
+	padding: 2px;
+	background-color: #006699;
+	color: #FFFFFF;
+	cursor: pointer;
+}
+
+/* TD: The cell containing the current month days, when disabled */
+TD.calThisMonthDaysDisabled {
+	font-family: sans-serif;
+	font-size: 9pt;
+	text-align: center;
+	background-color: #000000;
+	color: #FFFFFF;
+	border-bottom-style: solid;
+	border-right-style: solid;
+	border-width: 1px;
+	border-color: #BBBBBB;
+}
+
+/* TD: The cell containing the calendar 'expand' bar */
+TD.calExpandBar { 
+    height: 9px; 
+    text-align: center;
+    background-color: #EEEEEE; 
+    border-top: solid #888888 1px;
+    border-left: solid #888888 1px;
+    border-bottom: solid #CCCCCC 1px;
+    border-right: solid #FFFFFF 1px;
+    cursor: pointer;
+}
+
+/* TD: The cell containing the calendar 'expand' bar */
+TD.calCollapseBar { 
+    height: 9px; 
+    text-align: center;
+    background-color: #EEEEEE; 
+    border-top: solid #888888 1px;
+    border-left: solid #888888 1px;
+    border-bottom: solid #CCCCCC 1px;
+    border-right: solid #FFFFFF 1px;
+    cursor: pointer;
+}

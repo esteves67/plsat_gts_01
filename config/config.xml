@@ -1,0 +1,1960 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no' ?>
+<!DOCTYPE GTSConfig SYSTEM "config.dtd" >
+
+<GTSConfig>
+
+    <!-- Configuration properties -->
+    <ConfigProperties>
+        <Property key="Config.ServiceProviderName">${ServiceProvider=GeoTelematic Solutions, Inc.}</Property>
+        <Property key="Config.HostAddress">${HostAddress=192.168.1.1}</Property>
+        <Property key="Config.HostName">${HostName=track.example.com}</Property>
+        <Property key="Config.ClientID">${ServiceAccount.ID=gts}</Property>
+        <Property key="Config.ClientName">${ServiceAccount.Name=}</Property>
+    </ConfigProperties>
+
+    <!-- Welcome message -->
+    <Welcome><![CDATA[
+        <html>
+        <center>
+        <h2>Welcome to the ${Config.ServiceProviderName} Configuration Assistant</h2>
+        <br>
+        <p>
+        This application will help you through the process of setting the most common configuration items.<br>
+        Please step through each of the configuration screens entering the requested information.<br>
+        If necessary, you may click "Back" to go back to a previous screen.<br>
+        Please click the 'Next' button below when you are ready to proceed.
+        </p>
+        </center>
+        </html>
+    ]]></Welcome>
+
+    <!-- =========================================================================== -->
+    <!-- Service Subscription Information -->
+    <PropertyGroup name="ServiceAccount">
+
+        <Description><![CDATA[
+            Service Account Information
+        ]]></Description>
+
+        <!-- Service Account ID -->
+        <PropertyItem key="ServiceAccount.ID" type="string" blankOk="false">
+            <Description><![CDATA[
+                Please Enter your ${Config.ServiceProviderName} Service Account ID:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Enter the Service Account ID provided by ${Config.ServiceProviderName}
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (This is the ID provided by ${Config.ServiceProviderName}.  If you have not been provided a Service Account ID,<br>
+                then enter the value "gts" into this fiels, or contact ${Config.ServiceProviderName} for the correct Service Account ID.)
+                </span>
+                </html>
+            ]]></Help>
+            <FieldLength>25</FieldLength>
+            <DefaultValue>${Config.ClientID}</DefaultValue>
+        </PropertyItem>
+
+        <!-- Service Account Name -->
+        <PropertyItem key="ServiceAccount.Name" type="string">
+            <Description><![CDATA[
+                Please Enter your ${Config.ServiceProviderName} Service Account Name:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Enter the name used to describe your organization
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (Enter the name used to describe your organization.)
+                </span>
+                </html>
+            ]]></Help>
+            <FieldLength>50</FieldLength>
+            <DefaultValue>${Config.ClientName}</DefaultValue>
+        </PropertyItem>
+
+    </PropertyGroup>
+
+    <!-- =========================================================================== -->
+    <!-- Server host/ip information -->
+    <PropertyGroup name="HostAddress" validator="">
+
+        <Description><![CDATA[
+            Gateway Host Address
+        ]]></Description>
+
+        <PropertyItem key="Host.IP" type="string" blankOk="false">
+            <Description><![CDATA[
+                Enter the Gateway Appliance IP Address:
+                (ie. "${Config.HostAddress}")
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Enter the IP address of this gateway host
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (This is the IP address of this host)
+                </span>
+                </html>
+            ]]></Help>
+            <FieldLength>16</FieldLength>
+            <DefaultValue>${Config.HostAddress}</DefaultValue>
+        </PropertyItem>
+
+        <PropertyItem key="Host.Name" type="string" blankOk="true">
+            <Description><![CDATA[
+                [Optional] Enter the Gateway Appliance domain name:
+                (ie. "${Config.HostName}")
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Enter the domain name of this gateway host
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (This is the domain name of this host)
+                </span>
+                </html>
+            ]]></Help>
+            <FieldLength>30</FieldLength>
+            <DefaultValue>${Config.HostName}</DefaultValue>
+        </PropertyItem>
+
+        <PropertyItem key="DCServerConfig.bindAddress" type="string" blankOk="true">
+            <Description><![CDATA[
+                [Optional] Enter the local host service 'bind' address (blank to bind to all local addresses):
+                (ie. "${Config.HostAddress}" or "${Config.HostName}")
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Enter the local host name or IP address to which the device communication servers should be 'bound'
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (This is the host name or IP address to which local device services are 'bound'.  This will be<br>
+                the IP address from which server communication to the device will originate.)
+                </span>
+                </html>
+            ]]></Help>
+            <FieldLength>30</FieldLength>
+            <DefaultValue></DefaultValue>
+        </PropertyItem>
+
+    </PropertyGroup>
+
+    <!-- =========================================================================== -->
+    <!-- DB Provider Information -->
+    <PropertyGroup name="DBProvider">
+
+        <Description><![CDATA[
+            Database provider
+        ]]></Description>
+
+        <PropertyItem key="db.sql.provider" type="list" blankOk="false">
+            <Description><![CDATA[
+                Select the Preferred Database Provider:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Select a Database Provider
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (This is the preferred database provider used to store persistent account/device/etc information.)
+                </span>
+                </html>
+            ]]></Help>
+            <Selection>
+                <SelectionItem key="mysql" default="true">MySQL MyISAM ("engine=MyISAM")</SelectionItem>
+                <SelectionItem key="mysql_old">Old MySQL MyISAM ("type=MyISAM")</SelectionItem>
+                <SelectionItem key="mysql_innodb">MySQL InnoDB ("engine=InnoDB")</SelectionItem>
+            </Selection>
+        </PropertyItem>
+
+        <PropertyItem key="db.sql.host" type="string">
+            <Description><![CDATA[
+                Enter the Database Provider host name:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Enter the Database Provider host name
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (This is the host name used to access the specified Database Provider)
+                </span>
+                </html>
+            ]]></Help>
+            <FieldLength>24</FieldLength>
+            <DefaultValue>localhost</DefaultValue>
+        </PropertyItem>
+
+        <PropertyItem key="db.sql.port" type="long">
+            <Description><![CDATA[
+                Enter the Database Provider access port:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Enter the Database Provider access port
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (This is the port used to access the specified Database Provider.<br>
+                MySQL default port is '3306', MAMP/WAMP/LAMP typically uses port '8889')
+                </span>
+                </html>
+            ]]></Help>
+            <FieldLength>6</FieldLength>
+            <DefaultValue>3306</DefaultValue>
+        </PropertyItem>
+
+        <PropertyItem key="db.dbConnectionPool" type="list" blankOk="false">
+            <Description><![CDATA[
+                Select the Preferred DB Connection Pooling Mode:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Select a Preferred DB Connection Pooling Mode
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (This is the preferred database connection pooling mode.)
+                </span>
+                </html>
+            ]]></Help>
+            <Selection>
+                <SelectionItem key="false" default="true">Per Thread</SelectionItem>
+                <SelectionItem key="true">Pooled (experimental)</SelectionItem>
+            </Selection>
+        </PropertyItem>
+
+    </PropertyGroup>
+
+    <!-- =========================================================================== -->
+    <!-- MapProvider -->
+    <PropertyGroup name="MapProvider">
+    
+        <Description><![CDATA[
+            Map Provider
+        ]]></Description>
+
+        <PropertyItem key="Domain.MapProvider.active" type="list" readOnly="false">
+            <Description><![CDATA[
+                Select the Preferred Map Provider:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Select the preferred MapProvider
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (Select the preferred Map Provider.  Note that some map providers may require a valid authorization key<br>
+                that you must obtain from the map provider vendor.)
+                </span>
+                </html>
+            ]]></Help>
+            <Selection>
+                <SelectionItem key="openLayers" default="true">OpenLayers/OpenStreetMaps</SelectionItem>
+                <SelectionItem key="virtualEarth">Microsoft Virtual Earth (Bing)</SelectionItem>
+                <SelectionItem key="googleMaps">Google Maps (key required)</SelectionItem>
+                <SelectionItem key="geoServer">OpenLayers/GeoServer (custom config required)</SelectionItem>
+                <SelectionItem key="sitiMapa">Sitimapa Maps API (key required)</SelectionItem>
+            </Selection>
+        </PropertyItem>
+    
+        <PropertyItem key="Domain.MapProvider.key" type="string">
+            <Description><![CDATA[
+                Enter the Map Provider Authorization Key (if required):
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Enter the MapProvider authorization key (if required)
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (Enter the authorization key required by the specific Map Provider vendor.  OpenLayers does not <br>
+                require an authorization key).
+                </span>
+                </html>
+            ]]></Help>
+            <FieldLength>70</FieldLength>
+            <DefaultValue></DefaultValue>
+        </PropertyItem>
+
+    </PropertyGroup>
+
+    <!-- =========================================================================== -->
+    <!-- ReverseGeocodeProvider -->
+    <PropertyGroup name="ReverseGeocodeProvider">
+    
+        <Description><![CDATA[
+            Reverse-Geocode Provider
+        ]]></Description>
+
+        <PropertyItem key="Domain.ReverseGeocodeProvider.active" type="list">
+            <Description><![CDATA[
+                Select the Preferred Reverse-Geocode Provider:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Select the preferred ReverseGeocodeProvider
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (Select the preferred Reverse-Geocode Provider.  The Reverse-Geocode service is what converts a Latitude/Longitude<br>
+                into an Address that can be displayed on a report.  Note that some reverse-geocode providers may require<br>
+                a valid authorization key that you must obtain from the reverse-geocode provider vendor.)
+                </span>
+                </html>
+            ]]></Help>
+            <Selection>
+                <SelectionItem key="none" default="true">none</SelectionItem>
+                <SelectionItem key="geonames">Geonames</SelectionItem>
+                <SelectionItem key="geonames_navteq">Geonames/Navteq (premium service, locally hosted)</SelectionItem>
+                <SelectionItem key="geonames_tiger">Geonames/Tiger (premium service, locally hosted)</SelectionItem>
+                <SelectionItem key="nominatim">OpenStreetMap Nominatim (hosted by Mapquest)</SelectionItem>
+                <SelectionItem key="google">Google</SelectionItem>
+                <SelectionItem key="gisgraphy">GISGraphy (locally hosted)</SelectionItem>
+                <SelectionItem key="geoInverso">Servinformacion (Columbia premium service)</SelectionItem>
+            </Selection>
+        </PropertyItem>
+
+        <PropertyItem key="Domain.ReverseGeocodeProvider.key" type="string">
+            <Description><![CDATA[
+                Enter the Reverse-Geocode Authorization Key (if required):
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Enter the ReverseGeocodeProvider authorization key (if required)
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (Enter the authorization key required by the specific Reverse-Geocode Provider vendor. <br>
+                Geonames 'free' service does not require an authorization key.)
+                </span>
+                </html>
+            ]]></Help>
+            <FieldLength>70</FieldLength>
+            <DefaultValue></DefaultValue>
+            <ReadOnly readOnly="false" unless="Domain.ReverseGeocodeProvider.active">none</ReadOnly>
+        </PropertyItem>
+   
+    </PropertyGroup>
+
+    <!-- =========================================================================== -->
+    <!-- GeocodeProvider -->
+    <PropertyGroup name="GeocodeProvider">
+    
+        <Description><![CDATA[
+            Geocode Provider
+        ]]></Description>
+
+        <PropertyItem key="Domain.GeocodeProvider.active" type="list">
+            <Description><![CDATA[
+                Select the Preferred Geocode Provider:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Select the preferred GeocodeProvider
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (Select the preferred Geocode Provider.  The Geocode service is what converts an Address into a<br>
+                Latitude/Longitude that can be displayed on a map.  Note that some geocode providers may require<br>
+                a valid authorization key that you must obtain from the geocode provider vendor.)
+                </span>
+                </html>
+            ]]></Help>
+            <Selection>
+                <SelectionItem key="none" default="true">none</SelectionItem>
+                <SelectionItem key="geonames">Geonames</SelectionItem>
+                <SelectionItem key="google">Google (premium service)</SelectionItem>
+                <SelectionItem key="tinygeocoder">TinyGeocoder (may be slow)</SelectionItem>
+                <SelectionItem key="geoInverso">Servinformacion (Columbia premium service)</SelectionItem>
+            </Selection>
+        </PropertyItem>
+
+        <PropertyItem key="Domain.GeocodeProvider.key" type="string">
+            <Description><![CDATA[
+                Enter the Geocode Authorization Key (if required):
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Enter the GeocodeProvider authorization key (if required)
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (Enter the authorization key required by the specific Geocode Provider vendor. <br>
+                Geonames 'free' service does not require an authorization key.)
+                </span>
+                </html>
+            ]]></Help>
+            <FieldLength>70</FieldLength>
+            <DefaultValue></DefaultValue>
+            <ReadOnly readOnly="false" unless="Domain.GeocodeProvider.active">none</ReadOnly>
+        </PropertyItem>
+    
+        <PropertyItem key="Domain.Properties.zoneInfo.enableGeocode" type="boolean">
+            <Description><![CDATA[
+                Check if 'Center on Address/ZipCode' is to be enabled on the Geozone Admin page:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Check this box to enable 'Center on Address/ZipCode' on Geozone Admin
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (This value indicates whether the 'Center on Address/ZipCode' field should be enabled on the<br>
+                Geozone Admin page.)
+                </span>
+                </html>
+            ]]></Help>
+            <DefaultValue>false</DefaultValue>
+            <ReadOnly readOnly="false" unless="Domain.GeocodeProvider.active">none</ReadOnly>
+        </PropertyItem>
+
+    </PropertyGroup>
+
+    <!-- =========================================================================== -->
+    <!-- SMTP -->
+    <PropertyGroup name="SMTP">
+    
+        <Description><![CDATA[
+            SMTP (EMail) Server
+        ]]></Description>
+
+        <PropertyItem key="smtp.host" type="string">
+            <Description><![CDATA[
+                Enter your SMTP email server hostname:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Enter the SMTP server name used to send email
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (This is the SMTP server name used to send outbound email.  Unless explicitly configured to  be an email relay,<br>
+                "localhost" is likely not the proper server. This value should be obtained from your email system administrator.)
+                </span>
+                </html>
+            ]]></Help>
+            <FieldLength>24</FieldLength>
+            <DefaultValue>localhost</DefaultValue>
+        </PropertyItem>
+        
+        <PropertyItem key="smtp.port" type="long">
+            <Description><![CDATA[
+                Enter your SMTP email server port:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Enter the SMTP server port used to send email
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (This is the SMTP server port used to send outbound email through the above SMTP server. This value should <br>
+                be obtained from your email system administrator.)
+                </span>
+                </html>
+            ]]></Help>
+            <FieldLength>6</FieldLength>
+            <DefaultValue>25</DefaultValue>
+        </PropertyItem>
+    
+        <PropertyItem key="smtp.enableSSL" type="boolean">
+            <Description><![CDATA[
+                Check if SSL is required to send EMail from this SMTP server:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Check this box if SSL is require for this SMTP server
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (This value indicates whether outbound SMTP connections should be encrypted via SSL.  This box should only <br>
+                be check if required to do so by your email system administrator.)
+                </span>
+                </html>
+            ]]></Help>
+            <DefaultValue>false</DefaultValue>
+        </PropertyItem>
+    
+        <PropertyItem key="smtp.user" type="string">
+            <Description><![CDATA[
+                Enter the authorized SMTP username (if required):
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Enter the authorized SMTP username
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (This is the username used for authorization/authentication on the specified SMTP server.  This value <br>
+                should be obtained from your email system administrator.)
+                </span>
+                </html>
+            ]]></Help>
+            <FieldLength>24</FieldLength>
+            <DefaultValue></DefaultValue>
+        </PropertyItem>
+    
+        <PropertyItem key="smtp.password" type="password">
+            <Description><![CDATA[
+                Enter the authorized SMTP user password (if required):
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Enter the authorized SMTP user password
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (This is the user password used for authorization/authentication on the specified SMTP server.  This value <br>
+                should be obtained from your email system administrator.)
+                </span>
+                </html>
+            ]]></Help>
+            <FieldLength>24</FieldLength>
+            <DefaultValue></DefaultValue>
+        </PropertyItem>
+
+        <PropertyItem key="smtp.user.emailAddress" type="string" blankOk="false">
+            <Description><![CDATA[
+                Enter the Notification 'From" EMail Address:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Enter the email address used for sending notifications
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (This is the email address indicated in the "From" field of an email.  Some SMTP/EMail service providers will<br>
+                require a specific email address for this purpose.  This value should be obtained from your email system <br>
+                administrator.)
+                </span>
+                </html>
+            ]]></Help>
+            <FieldLength>40</FieldLength>
+            <DefaultValue>notify@email.example.com</DefaultValue>
+        </PropertyItem>
+   
+    </PropertyGroup>
+
+    <!-- =========================================================================== -->
+    <!-- Web-Interface Information -->
+    <PropertyGroup name="WebInterface">
+
+        <Description><![CDATA[
+            General Web-Interface
+        ]]></Description>
+
+        <PropertyItem key="Domain.locale" type="list" blankOk="false">
+            <Description><![CDATA[
+                Select the Preferred Language (displayed on the web pages):
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Select the language locale
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (This is the preferred language in which the text will be displayed on your web-interface.)
+                </span>
+                </html>
+            ]]></Help>
+            <Selection>
+                <SelectionItem key="de">German</SelectionItem>
+                <SelectionItem key="el">Greek</SelectionItem>
+                <SelectionItem key="en" default="true">English</SelectionItem>
+                <SelectionItem key="es">Spanish</SelectionItem>
+                <SelectionItem key="fr">French</SelectionItem>
+                <SelectionItem key="it">Italian</SelectionItem>
+                <SelectionItem key="nl">Dutch</SelectionItem>
+                <SelectionItem key="pt">Portuguese</SelectionItem>
+                <SelectionItem key="ro">Romanian</SelectionItem>
+                <SelectionItem key="ru">Russian</SelectionItem>
+                <SelectionItem key="sr">Serbian</SelectionItem>
+                <SelectionItem key="tr">Turkish</SelectionItem>
+            </Selection>
+        </PropertyItem>
+
+        <Separator/>
+
+        <PropertyItem key="Domain.PageTitle" type="string" blankOk="false">
+            <Description><![CDATA[
+                Enter the Preferred WebPage Header Title:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Enter the title to display at the top of the log-in web pages
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (This is the web-interface "Title" which will be displayed in the web-interface login banner.)
+                </span>
+                </html>
+            ]]></Help>
+            <FieldLength>50</FieldLength>
+            <DefaultValue>${Config.ClientName} GPS Tracking</DefaultValue>
+        </PropertyItem>
+
+        <PropertyItem key="Domain.Copyright" type="string" blankOk="false">
+            <Description><![CDATA[
+                Enter the Preferred WebPage Copyright Footer:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Enter the text to display at the bottom of the log-in web pages
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (This is the web-interface "Copyright" displayed at the bottom web-interface pages.)
+                </span>
+                </html>
+            ]]></Help>
+            <FieldLength>50</FieldLength>
+            <DefaultValue>Copyright(C) GeoTelematic Solutions, Inc.</DefaultValue>
+        </PropertyItem>
+
+        <Separator/>
+
+        <PropertyItem key="Domain.accountLogin" type="boolean">
+            <Description><![CDATA[
+                Check this box to display the login "Account" field:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Check this box to display the login "Account" field
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (If checked, the "Account" login field will be displayed on the login page.)
+                </span>
+                </html>
+            ]]></Help>
+            <DefaultValue>true</DefaultValue>
+        </PropertyItem>
+
+        <PropertyItem key="Domain.userLogin" type="boolean">
+            <Description><![CDATA[
+                Check this box to display the login "User" field:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Check this box to display the login "User" field
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (If checked, the "User" login field will be displayed on the login page.)
+                </span>
+                </html>
+            ]]></Help>
+            <DefaultValue>true</DefaultValue>
+        </PropertyItem>
+
+        <PropertyItem key="Domain.emailLogin" type="boolean">
+            <Description><![CDATA[
+                Check this box to display the login "EMail" field:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Check this box to display the login "EMail" field
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (If checked, the "EMail" login field will be displayed on the login page.)
+                </span>
+                </html>
+            ]]></Help>
+            <DefaultValue>false</DefaultValue>
+        </PropertyItem>
+
+        <PropertyItem key="Domain.Properties.accountLogin.showLocaleSelection" type="boolean">
+            <Description><![CDATA[
+                Check to display a pull-down of the available language translations on the login page:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Check this box to display a pull-down of the available language translations on the login page
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (This value indicates whether the language translations section pulldown menu will be displayed)
+                </span>
+                </html>
+            ]]></Help>
+            <DefaultValue>false</DefaultValue>
+        </PropertyItem>
+
+        <PropertyItem key="Domain.demo" type="boolean">
+            <Description><![CDATA[
+                Check this box to enable the 'Demo' Account login:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Check this button to enable the 'demo' account
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (If checked, the "Demo" button will be available on the login page.)
+                </span>
+                </html>
+            ]]></Help>
+            <DefaultValue>true</DefaultValue>
+        </PropertyItem>
+
+        <Separator/>
+
+        <PropertyItem key="Domain.Properties.topMenu.menuType" type="list" readOnly="false">
+            <Description><![CDATA[
+                Select the Preferred Main Menu Type:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Select the preferred main menu type
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (Select the preferred main menu type.)
+                </span>
+                </html>
+            ]]></Help>
+            <Selection>
+                <SelectionItem key="expand" default="true">Collapsible Text Link Menu (text only)</SelectionItem>
+                <SelectionItem key="expand-icon"          >Collapsible Text Link Menu (with icon)</SelectionItem>
+                <SelectionItem key="fixed"                >Fixed Text Link Menu (text only)</SelectionItem>
+                <SelectionItem key="fixed-icon"           >Fixed Text Link Menu (with icon)</SelectionItem>
+                <SelectionItem key="button-icon"          >Button Image Menu (with icon)</SelectionItem>
+            </Selection>
+        </PropertyItem>
+
+        <Separator/>
+
+        <PropertyItem key="Domain.DateFormat" type="list">
+            <Description><![CDATA[
+                Select the Preferred Date Format:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Select the preferred data format
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (Select the preferred data format displayed on reports.)
+                </span>
+                </html>
+            ]]></Help>
+            <Selection>
+                <SelectionItem key="yyyy/MM/dd" default="true">Year/Month/Day</SelectionItem>
+                <SelectionItem key="MM/dd/yyyy">Month/Day/Year</SelectionItem>
+                <SelectionItem key="dd/MM/yyyy">Day/Month/Year</SelectionItem>
+            </Selection>
+        </PropertyItem>
+
+        <PropertyItem key="Domain.TimeFormat" type="list">
+            <Description><![CDATA[
+                Select the Preferred Date Format:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Select the preferred time format
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (Select the preferred time format displayed on reports.)
+                </span>
+                </html>
+            ]]></Help>
+            <Selection>
+                <SelectionItem key="HH:mm:ss" default="true">24Hour:Minute:Second (ie. 22:27:43)</SelectionItem>
+                <SelectionItem key="hh:mm:ss aa">12Hour:Minute:Second AM/PM (ie. 10:27:43 PM)</SelectionItem>
+            </Selection>
+        </PropertyItem>
+
+        <PropertyItem key="Domain.Properties.calendar.firstDayOfWeek" type="list">
+            <Description><![CDATA[
+                Select the Preferred Calendar First-Day-Of-Week:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Select the preferred calendar first-day-of-the-week
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (Select the map/report calendar first day of week.  US territories use Sunday as the first day of the week.<br>
+                European teriitories typically use Monday as the first day of the week.)
+                </span>
+                </html>
+            ]]></Help>
+            <Selection>
+                <SelectionItem key="0" default="true">Sunday</SelectionItem>
+                <SelectionItem key="1">Monday</SelectionItem>
+            </Selection>
+        </PropertyItem>
+        
+        <Separator/>
+
+        <!-- loginSession Look&Feel -->
+        <!--
+        <PropertyItem key="Domain.WebPages.JSP" type="list" blankOk="false">
+            <Description><![CDATA[
+                Select the Login Look-and-Feel Layout:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Select the login look-and-feel layout
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (Select the desire Login Look-and-Feel layout)
+                </span>
+                </html>
+            ]]></Help>
+            <Selection>
+                <SelectionItem key="default" default="true">Traditional Layout</SelectionItem>
+                <SelectionItem key="sbanner">Shadow Banner Layout</SelectionItem>
+            </Selection>
+        </PropertyItem>
+        -->
+
+        <!-- loginSession Look&Feel -->
+        <PropertyItem key="JSPEntry.default" type="list" blankOk="true">
+            <Description><![CDATA[
+                Select the Login Look-and-Feel Layout:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Select the login look-and-feel layout
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (Select the desire Login Look-and-Feel layout)
+                </span>
+                </html>
+            ]]></Help>
+            <Selection>
+                <SelectionItem key="default" default="true">Default Layout</SelectionItem>
+                <SelectionItem key="sbanner">Title Over Banner</SelectionItem>
+                <SelectionItem key="cbanner">Centered Custom Banner</SelectionItem>
+                <SelectionItem key="wbanner">Wide Banner</SelectionItem>
+            </Selection>
+        </PropertyItem>
+
+        <!-- Background Color -->
+        <PropertyItem key="Background.color" type="color" blankOk="false">
+            <Description><![CDATA[
+                Web-page Background Color:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Choose the desired background color for the web-page look and feel
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (Choose the desired background color for the web-page look and feel)
+                </span>
+                </html>
+            ]]></Help>
+            <DefaultValue>#FFFFFF</DefaultValue>
+            <!-- <ReadOnly readOnly="true" unless="Domain.WebPages.JSP">sbanner</ReadOnly> -->
+        </PropertyItem>
+
+    </PropertyGroup>
+
+    <!-- =========================================================================== -->
+    <!-- Administration -->
+    <PropertyGroup name="Administration">
+    
+        <Description><![CDATA[
+            Administration 
+        ]]></Description>
+
+        <!-- ===== -->
+        
+        <PropertyItem key="DeviceInput.SupportFeatures" type="none">
+            <Description><![CDATA[
+                Device (Vehicle) Admin:
+                ]]></Description>
+        </PropertyItem>
+
+        <!-- allow new device creation -->
+        <PropertyItem key="Domain.Properties.deviceInfo.allowNewDevice" type="list" blankOk="true">
+            <Description><![CDATA[
+                Allow Account to create new devices:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Select the Device Creation authorization for the Device Admin page.
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (Select the desired device creation authentication)
+                </span>
+                </html>
+            ]]></Help>
+            <Selection>
+                <SelectionItem key="true" default="true">Allow Device Creation</SelectionItem>
+                <SelectionItem key="false">Do Not Allow Device Creation</SelectionItem>
+                <SelectionItem key="sysadmin">System Admin Device Creation Only</SelectionItem>
+            </Selection>
+        </PropertyItem>
+
+        <PropertyItem key="Domain.Properties.deviceInfo.showSmsButton" type="boolean">
+            <Description><![CDATA[
+                Check to show the "SMS" command selection button:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Check this box to display the "SMS" command selection button on the Device Admin list page.
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (This value indicates whether the "SMS" command selection button will be displayed on the Device Admin list page)
+                </span>
+                </html>
+            ]]></Help>
+            <DefaultValue>false</DefaultValue>
+        </PropertyItem>
+
+        <PropertyItem key="Domain.Properties.deviceInfo.showNotes" type="boolean">
+            <Description><![CDATA[
+                Check to show the "Notes" field on the edit page:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Check this box to display the "Notes" field on the Device Admin edit page.
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (This value indicates whether the "Notes" field will be displayed on the Device Admin edit page)
+                </span>
+                </html>
+            ]]></Help>
+            <DefaultValue>false</DefaultValue>
+        </PropertyItem>
+
+        <Separator/>
+
+    </PropertyGroup>
+
+    <!-- =========================================================================== -->
+    <!-- TrackMap -->
+    <PropertyGroup name="TrackMap">
+    
+        <Description><![CDATA[
+            Track Map 
+        ]]></Description>
+    
+        <PropertyItem key="Domain.Properties.trackMap.mapControlLocation" type="list" readOnly="false">
+            <Description><![CDATA[
+                Select the Map Controls Location:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Select whether to display the map controls to the left or right of the map
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (This controls which side of the map the map-controls will be displayed.  Select "left" to show the map<br>
+                controls on the left, and "right" to show the map controls on the right.)
+                </span>
+                </html>
+            ]]></Help>
+            <Selection>
+                <SelectionItem key="left">Show Controls on Left</SelectionItem>
+                <SelectionItem key="right" default="true">Show Controls on Right</SelectionItem>
+            </Selection>
+        </PropertyItem>
+
+        <PropertyItem key="Domain.Properties.trackMap.calendarAction" type="list">
+            <Description><![CDATA[
+                Select the Preferred Calendar Display Option on Device Map Page:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Select the preferred calendar display option
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (Select the calendar display option.  "Fixed" will show 2 full From/To calendars.  "Fade/Scroll" will allow<br>
+                scrolling one calendar on top of another.  "PopUp" will show only the From/To calendar header and clicking <br>
+                on the header will cause the selected calendar to display.)
+                </span>
+                </html>
+            ]]></Help>
+            <Selection>
+                <SelectionItem key="fade" default="true">Fade/Scroll</SelectionItem>
+                <SelectionItem key="popup">Popup</SelectionItem>
+                <SelectionItem key="fixed">Fixed</SelectionItem>
+            </Selection>
+        </PropertyItem>
+
+        <PropertyItem key="Domain.Properties.trackMap.showTimezoneSelection" type="boolean">
+            <Description><![CDATA[
+                Check to display TimeZone section pulldown menu on on Track Map pages:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Check this box to display the TimeZone section pulldown menu on the Device/Fleet map page
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (This value indicates whether the TimeZone section pulldown menu will be displayed)
+                </span>
+                </html>
+            ]]></Help>
+            <DefaultValue>true</DefaultValue>
+        </PropertyItem>
+
+        <PropertyItem key="Domain.Properties.trackMap.showCursorLocation" type="boolean">
+            <Description><![CDATA[
+                Check to display Cursor Latitude/Logitude location on the map:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Check this box to display the Cursor Latitude/Logitude location
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (This value indicates whether the Cursor Latitude/Longitude location should be displayed in<br>
+                the map control area)
+                </span>
+                </html>
+            ]]></Help>
+            <DefaultValue>true</DefaultValue>
+        </PropertyItem>
+
+        <PropertyItem key="Domain.Properties.trackMap.showLegend" type="boolean">
+            <Description><![CDATA[
+                Check to display the Pushpin legend on the map:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Check this box to display the Pushpin legend
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (This value indicates whether the Pushpin Legend should be displayed in the map control area)<br>
+                </span>
+                </html>
+            ]]></Help>
+            <DefaultValue>true</DefaultValue>
+        </PropertyItem>
+
+        <PropertyItem key="Domain.Properties.trackMap.limitType" type="list" readOnly="false">
+            <Description><![CDATA[
+                Select the Map Overflow Display Behavior:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Select whether to display the first, or last, set of points when there are too many 
+                points to display at one time
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (In the case where their are more pushpin than can be displayed on a single map, select "Show first..." to<br>
+                display the first set of events, omitting the remaining events from the display.  Or select "Show last..."<br>
+                to display the last, most recent, events, omitting the older events.)
+                </span>
+                </html>
+            ]]></Help>
+            <Selection>
+                <SelectionItem key="first">Show first records</SelectionItem>
+                <SelectionItem key="last" default="true">Show last records</SelectionItem>
+            </Selection>
+        </PropertyItem>
+
+        <PropertyItem key="Domain.Properties.trackMap.detailAscending" type="list">
+            <Description><![CDATA[
+                Select the display order for the "Location Detail" list:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Select the display order for the "Location Detail" list
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (Select "Ascending" to display events from oldest to newest.<br>
+                Select "Descending to display events fron newest to oldest).
+                </span>
+                </html>
+            ]]></Help>
+            <Selection>
+                <SelectionItem key="true" default="true">Ascending by event time</SelectionItem>
+                <SelectionItem key="false">Descending by event time</SelectionItem>
+            </Selection>
+        </PropertyItem>
+
+        <Separator/>
+
+        <PropertyItem key="Domain.Properties.deviceChooser.useTable" type="boolean">
+            <Description><![CDATA[
+                Check to display DeviceChooser pulldown menu on maps and report menu:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Check this box to display DeviceChooser pulldown menu on maps and report menu
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (This value indicates whether the DeviceChooser pull-down menu will be displayed <BR>
+                or a standard pull-down menu combo-box)
+                </span>
+                </html>
+            ]]></Help>
+            <DefaultValue>true</DefaultValue>
+        </PropertyItem>
+    
+        <PropertyItem key="Domain.Properties.deviceChooser.search" type="boolean">
+            <Description><![CDATA[
+                Check to display the 'Search' field in the DeviceChooser pulldown menu:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Check this box to display the 'Search' field in the DeviceChooser pulldown menu
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (This value indicates whether the 'Search' field should be displayed in the DeviceChooser <br>
+                pull-down menu)
+                </span>
+                </html>
+            ]]></Help>
+            <DefaultValue>true</DefaultValue>
+        </PropertyItem>
+
+        <Separator/>
+
+        <PropertyItem key="Domain.MapProvider.auto.enable" type="boolean">
+            <Description><![CDATA[
+                Check to enable "Auto Update" on map:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Check this box to enable "Auto Update".
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (This value indicates whether the "Auto" button should be visible/enabled on the map)
+                </span>
+                </html>
+            ]]></Help>
+            <DefaultValue>false</DefaultValue>
+        </PropertyItem>
+   
+        <PropertyItem key="Domain.MapProvider.auto.interval" type="long">
+            <Description><![CDATA[
+                "Auto Update" interval (in seconds):
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Enter the auto-update interval, in seconds.
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (This value specifies the auto-update interval, in seconds).
+                </span>
+                </html>
+            ]]></Help>
+            <DefaultValue>120</DefaultValue>
+            <ReadOnly readOnly="false" unless="Domain.MapProvider.auto.enable">false</ReadOnly>
+        </PropertyItem>
+   
+        <PropertyItem key="Domain.MapProvider.auto.count" type="long">
+            <Description><![CDATA[
+                "Auto Update" Count:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Enter the number of auto-updates to perform before it turns off
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (This value specifies the number of auto-updates that are to be performed before the auto-update <br>
+                stops, requiring that the button be pressed again to start another auto-update sequence).
+                </span>
+                </html>
+            ]]></Help>
+            <DefaultValue>10</DefaultValue>
+            <ReadOnly readOnly="false" unless="Domain.MapProvider.auto.enable">false</ReadOnly>
+        </PropertyItem>
+   
+        <PropertyItem key="Domain.Properties.trackMap.autoUpdateRecenter" type="list">
+            <Description><![CDATA[
+                "Auto Update" map update zomm/recenter behavior:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Select the desired zoom/recenter behavior when auto-updated the map
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (This selection specifies the zoom/center behavior when auto-updating the map at the specified <br>
+                interval.  Options are to leave the zoom/center as-is, zoome/center on the last pushpin, or <br>
+                zoom/center so all pushpins are displayed).
+                </span>
+                </html>
+            ]]></Help>
+            <Selection>
+                <SelectionItem key="zoom" default="true">Zoom/Center On All Displayed Pushpins</SelectionItem>
+                <SelectionItem key="last">Zoom/Center On Last Pushpin Only</SelectionItem>
+                <SelectionItem key="no">Leave Map Zoom/Center As-Is</SelectionItem>
+            </Selection>
+            <ReadOnly readOnly="false" unless="Domain.MapProvider.auto.enable">false</ReadOnly>
+        </PropertyItem>
+
+        <Separator/>
+
+        <PropertyItem key="Domain.MapProvider.replay.enable" type="boolean">
+            <Description><![CDATA[
+                Check to enable "Replay" on map:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Check this box to enable pushpin "Replay".
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (This value indicates whether the "Replay" button should be visible/enabled on the map)
+                </span>
+                </html>
+            ]]></Help>
+            <DefaultValue>false</DefaultValue>
+        </PropertyItem>
+   
+        <PropertyItem key="Domain.MapProvider.replay.interval" type="long">
+            <Description><![CDATA[
+                "Replay" interval (in milliseconds):
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Enter the replay interval, in milliseconds.
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (This value specifies the replay interval, in 'milliseconds' if greater 30.<br>
+                If the specified value is 30 or less, then the value will be interpreted as 'seconds').
+                </span>
+                </html>
+            ]]></Help>
+            <DefaultValue>1500</DefaultValue>
+            <ReadOnly readOnly="false" unless="Domain.MapProvider.replay.enable">false</ReadOnly>
+        </PropertyItem>
+   
+        <PropertyItem key="Domain.MapProvider.replay.singlePushpin" type="boolean">
+            <Description><![CDATA[
+                Check to display a single pushpin only when replaying the track:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                CHeck this box to display a single pushpin only during replay.
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (This value indicates whether only a single pushpin should be displayed when replaying<br>
+                the pushpin tracks).
+                </span>
+                </html>
+            ]]></Help>
+            <DefaultValue>false</DefaultValue>
+            <ReadOnly readOnly="false" unless="Domain.MapProvider.replay.enable">false</ReadOnly>
+        </PropertyItem>
+
+        <Separator/>
+
+        <PropertyItem key="Domain.MapProvider.map.routeLine" type="boolean">
+            <Description><![CDATA[
+                Check to draw the "Route-Line" between adjacent Device pushpins:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Check this box to enable the pushpin "Route-Line".
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (This value indicates whether the "Route-Line" between adjacent Device pushpins<br>
+                should be drawn on the map)
+                </span>
+                </html>
+            ]]></Help>
+            <DefaultValue>true</DefaultValue>
+        </PropertyItem>
+
+    </PropertyGroup>
+
+    <!-- =========================================================================== -->
+    <!-- ReportOptions -->
+    <PropertyGroup name="ReportOptions">
+    
+        <Description><![CDATA[
+            Report Options
+            ]]></Description>
+
+        <PropertyItem key="Domain.Properties.reportMenu.useMapDates" type="boolean">
+            <Description><![CDATA[
+                Check to set the Report Menu calendar date/time with last date/time selected on Track Map:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Check this box to use the date/time last menu on the on the Track Map page
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (This value indicates whether the Report calendar should be initialized with the last selected<br>
+                date/time from the Track Map pages)
+                </span>
+                </html>
+            ]]></Help>
+            <DefaultValue>true</DefaultValue>
+        </PropertyItem>
+
+        <PropertyItem key="Domain.Properties.reportMenu.showTimezoneSelection" type="boolean">
+            <Description><![CDATA[
+                Check to display the TimeZone section pulldown on on Report Menu page:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Check this box to display the TimeZone section pulldown menu on the Report Menu page
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (This value indicates whether the TimeZone section pulldown menu will be displayed)
+                </span>
+                </html>
+            ]]></Help>
+            <DefaultValue>true</DefaultValue>
+        </PropertyItem>
+
+        <PropertyItem key="Domain.Properties.reportMenu.enableReportEmail" type="boolean">
+            <Description><![CDATA[
+                Check to enable the "EMail Report" option on the Report Menu:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Check this box to enable the "EMail Report" option on the Report Menu
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (This value indicates whether the "EMail Report" option should be enabled and available in the<br>
+                report output format selection pull-down on the Report Menu)
+                </span>
+                </html>
+            ]]></Help>
+            <DefaultValue>false</DefaultValue>
+        </PropertyItem>
+
+        <PropertyItem key="Domain.Properties.reportMenu.customFormatURL" type="string" blankOk="true">
+            <Description><![CDATA[
+                Enter a custom report output format URL:
+            ]]></Description>
+            <ToolTip><![CDATA[
+                Enter a custom report output format URL
+            ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (If specified, this URL will be used to compose a custom report output option which will be<br>
+                selectable on the report menu when generating a report.  The report selection options will<br>
+                be appended to this URL when the user selects the "Custom" report format)
+                </span>
+                </html>
+            ]]></Help>
+            <DefaultValue></DefaultValue>
+        </PropertyItem>
+
+        <Separator/>
+
+        <PropertyItem key="Domain.Reports" type="none">
+            <Description><![CDATA[
+                Check the reports to be included:
+                ]]></Description>
+        </PropertyItem>
+
+        <PropertyItem key="Domain.Reports.EventThermo" type="boolean">
+            <Label><![CDATA[
+                <html>
+                <span style="color:black">
+                Temperature Report (requires hardware which supports this feature)
+                </span>
+                </html>
+                ]]></Label>
+            <ToolTip><![CDATA[
+                Check this box to include the Temperature report
+                ]]></ToolTip>
+            <DefaultValue>false</DefaultValue>
+        </PropertyItem>
+    
+        <PropertyItem key="Domain.Reports.PropertyValue" type="boolean">
+            <Label><![CDATA[
+                <html>
+                <span style="color:black">
+                PropertyValue Report (used for OpenDMTP compliant devices)
+                </span>
+                </html>
+                ]]></Label>
+            <ToolTip><![CDATA[
+                Check this box to include the PropertyValue report
+                ]]></ToolTip>
+            <DefaultValue>false</DefaultValue>
+        </PropertyItem>
+  
+        <PropertyItem key="Domain.Reports.DiagnosticValue" type="boolean">
+            <Label><![CDATA[
+                <html>
+                <span style="color:black">
+                DiagnosticValue Report (used for OpenDMTP compliant devices)
+                </span>
+                </html>
+                ]]></Label>
+            <ToolTip><![CDATA[
+                Check this box to include the DiagnosticValue report
+                ]]></ToolTip>
+            <DefaultValue>false</DefaultValue>
+        </PropertyItem>
+  
+        <PropertyItem key="Domain.Reports.EventFaultCodes" type="boolean">
+            <Label><![CDATA[
+                <html>
+                <span style="color:black">
+                OBD Fault Code Report (requires hardware which supports this feature)
+                </span>
+                </html>
+                ]]></Label>
+            <ToolTip><![CDATA[
+                Check this box to include the J1708 FaultCode report
+                ]]></ToolTip>
+            <DefaultValue>false</DefaultValue>
+        </PropertyItem>
+  
+        <PropertyItem key="Domain.Reports.EventSpeedPosted" type="boolean">
+            <Label><![CDATA[
+                <html>
+                <span style="color:black">
+                Exceeding Posted Speed-Limit Report (requires Geonames/NavTeq reverse-geocode service)
+                </span>
+                </html>
+                ]]></Label>
+            <ToolTip><![CDATA[
+                Check this box to include the Exceeding Posted Speed-Limit report
+                ]]></ToolTip>
+            <DefaultValue>false</DefaultValue>
+        </PropertyItem>
+ 
+        <PropertyItem key="Domain.Reports.EventWaymark1Detail" type="boolean">
+            <Label><![CDATA[
+                <html>
+                <span style="color:black">
+                WayMark-1 Detail Report
+                </span>
+                </html>
+                ]]></Label>
+            <ToolTip><![CDATA[
+                Check this box to include the WayMark-1 detail report
+                ]]></ToolTip>
+            <DefaultValue>false</DefaultValue>
+        </PropertyItem>
+ 
+        <PropertyItem key="Domain.Reports.DriverMessageDetail" type="boolean">
+            <Label><![CDATA[
+                <html>
+                <span style="color:black">
+                Driver Message Detail Report
+                </span>
+                </html>
+                ]]></Label>
+            <ToolTip><![CDATA[
+                Check this box to include the Driver Message detail report
+                ]]></ToolTip>
+            <DefaultValue>false</DefaultValue>
+        </PropertyItem>
+
+        <!-- ====================================================== -->
+        <Separator/>
+
+        <PropertyItem key="Domain.Reports.Columns" type="none">
+            <Description><![CDATA[
+                Check the columns that should be included on various reports:
+                ]]></Description>
+        </PropertyItem>
+
+        <PropertyItem key="ReportDefinition.columnLatLon" type="boolean">
+            <Label><![CDATA[
+                <html>
+                <span style="color:black">
+                Include the Latitude/Longitude columns
+                </span>
+                </html>
+                ]]></Label>
+            <ToolTip><![CDATA[
+                Check this box to include the Latitude/Longitude on selected reports
+                ]]></ToolTip>
+            <DefaultValue>true</DefaultValue>
+        </PropertyItem>
+
+        <PropertyItem key="ReportDefinition.columnOdometer" type="boolean">
+            <Label><![CDATA[
+                <html>
+                <span style="color:black">
+                Include the Odometer column
+                </span>
+                </html>
+                ]]></Label>
+            <ToolTip><![CDATA[
+                Check this box to include the Odometer value on selected reports
+                ]]></ToolTip>
+            <DefaultValue>true</DefaultValue>
+        </PropertyItem>
+
+        <PropertyItem key="ReportDefinition.columnFuelUsage" type="boolean">
+            <Label><![CDATA[
+                <html>
+                <span style="color:black">
+                Include Fuel Usage column (requires hardware which supports this feature)
+                </span>
+                </html>
+                ]]></Label>
+            <ToolTip><![CDATA[
+                Check this box to include the Fuel Usage columns on selected reports
+                ]]></ToolTip>
+            <DefaultValue>false</DefaultValue>
+        </PropertyItem>
+
+        <PropertyItem key="ReportDefinition.columnFuelEconomy" type="boolean">
+            <Label><![CDATA[
+                <html>
+                <span style="color:black">
+                Include Fuel Economy column (requires hardware which supports this feature)
+                </span>
+                </html>
+                ]]></Label>
+            <ToolTip><![CDATA[
+                Check this box to include the Fuel Economy columns on selected reports
+                ]]></ToolTip>
+            <DefaultValue>false</DefaultValue>
+        </PropertyItem>
+
+        <PropertyItem key="ReportDefinition.columnIndexMapLink" type="boolean">
+            <Label><![CDATA[
+                <html>
+                <span style="color:black">
+                Include a map-link on the "index" column of EventDetail reports.
+                </span>
+                </html>
+                ]]></Label>
+            <ToolTip><![CDATA[
+                Check this box to include a clickable link on the report index which will
+                display the map with the selected information-balloon displayed.
+                ]]></ToolTip>
+            <DefaultValue>false</DefaultValue>
+        </PropertyItem>
+
+    </PropertyGroup>
+
+    <!-- =========================================================================== -->
+    <!-- Event Handling -->
+    <PropertyGroup name="EventHandling">
+    
+        <Description><![CDATA[
+            Special Event Handling
+            ]]></Description>
+
+        <PropertyItem key="Device.futureDate.action" type="list" blankOk="false">
+            <Description><![CDATA[
+                Select the desired behavior when a future date/time is encountered on an incoming Event:
+                ]]></Description>
+            <ToolTip><![CDATA[
+                Select the desired behavior for future date/time events
+                ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (The value determines how events will be handled that have event times in the future)
+                </span>
+                </html>
+                ]]></Help>
+            <Selection>
+                <SelectionItem key="disabled" default="true">Do nothing (accept date as-is)</SelectionItem>
+                <SelectionItem key="ignore">Ignore the event with the future date</SelectionItem>
+                <SelectionItem key="truncate">Set date/time to current time plus the maximum future time</SelectionItem>
+            </Selection>
+        </PropertyItem>
+       
+        <PropertyItem key="Device.futureDate.maximumSec" type="long">
+            <Description><![CDATA[
+                Enter the maximum number of seconds allowed that a reported event time may be into the future:
+                ]]></Description>
+            <ToolTip><![CDATA[
+                Enter the maximum number of seconds allowed that a reported event time may be into the future:
+                ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (This value represents the maximum number of seconds that the reported time from an invoming   <br>
+                event may be into the future.)
+                </span>
+                </html>
+                ]]></Help>
+            <FieldLength>7</FieldLength>
+            <DefaultValue>86400</DefaultValue>
+        </PropertyItem>
+
+        <!-- ====================================================== -->
+        <Separator/>
+
+        <PropertyItem key="Device.invalidSpeed.action" type="list" blankOk="false">
+            <Description><![CDATA[
+                Select the desired behavior when an invalid speed is encountered on an incoming Event:
+                ]]></Description>
+            <ToolTip><![CDATA[
+                Select the desired behavior for invalid speed events
+                ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (The value determines how events will be handled that have an invalid speed)
+                </span>
+                </html>
+                ]]></Help>
+            <Selection>
+                <SelectionItem key="disabled" default="true">Do nothing (accept speed as-is)</SelectionItem>
+                <SelectionItem key="ignore">Ignore the event with the invalid speed</SelectionItem>
+                <SelectionItem key="truncate">Set speed to the maximum speed value</SelectionItem>
+            </Selection>
+        </PropertyItem>
+     
+        <PropertyItem key="Device.invalidSpeed.maximumKPH" type="long">
+            <Description><![CDATA[
+                Enter the maximum allowed speed (in kilometers) that may be reported by an incoming event:
+                ]]></Description>
+            <ToolTip><![CDATA[
+                Enter the maximum allowed speed (in kilometers) that may be reported by an incoming event:
+                ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (This value represents the maximum speed (in kilometers) that an event may report)
+                </span>
+                </html>
+                ]]></Help>
+            <FieldLength>4</FieldLength>
+            <DefaultValue>240</DefaultValue>
+        </PropertyItem>
+
+        <!-- ====================================================== -->
+        <Separator/>
+
+        <PropertyItem key="Device.maximumOdometerKM" type="long">
+            <Description><![CDATA[
+                Enter the maximum allowed odometer value (in kilometers) that may be recorded:
+                ]]></Description>
+            <ToolTip><![CDATA[
+                Enter the maximum allowed odometer value (in kilometers) that may be recorded:
+                ]]></ToolTip>
+            <Help><![CDATA[
+                <html>
+                <span style="color:gray">
+                (This value is used to help filter out possible invalid odometer values that may be  <br>
+                reported by the remote GPS tracking/telematic device)
+                </span>
+                </html>
+                ]]></Help>
+            <FieldLength>8</FieldLength>
+            <DefaultValue>1000000</DefaultValue>
+        </PropertyItem>
+
+    </PropertyGroup>
+
+    <!-- =========================================================================== -->
+    <!-- Additional Table fields -->
+    <PropertyGroup name="AdditionalTableFields">
+    
+        <Description><![CDATA[
+            Additional Table Fields
+            ]]></Description>
+
+        <!-- ===== -->
+        
+        <PropertyItem key="Account.SupportFeatures" type="none">
+            <Description><![CDATA[
+                Additional 'Account' table fields:
+                ]]></Description>
+        </PropertyItem>
+  
+        <PropertyItem key="startupInit.Account.AddressFieldInfo" type="boolean">
+            <Label><![CDATA[
+                'AddressFieldInfo' Fields (additional address information)
+                ]]></Label>
+            <ToolTip><![CDATA[
+                Check this box to include additional 'AddressFieldInfo' fields in the Account table
+                ]]></ToolTip>
+            <DefaultValue>false</DefaultValue>
+        </PropertyItem>
+  
+        <PropertyItem key="startupInit.Account.AccountManagerInfo" type="boolean">
+            <Label><![CDATA[
+                'AccountManagerInfo' Fields (support for Account Managers)
+                ]]></Label>
+            <ToolTip><![CDATA[
+                Check this box to include additional 'AccountManagerInfo' fields in the Account table
+                ]]></ToolTip>
+            <DefaultValue>false</DefaultValue>
+        </PropertyItem>
+
+        <!-- ===== -->
+        <Separator/>
+
+        <PropertyItem key="User.SupportFeatures" type="none">
+            <Description><![CDATA[
+                Additional 'User' table fields:
+                ]]></Description>
+        </PropertyItem>
+        
+        <PropertyItem key="startupInit.User.AddressFieldInfo" type="boolean">
+            <Label><![CDATA[
+                'AddressFieldInfo' Fields (additional address information)
+                ]]></Label>
+            <ToolTip><![CDATA[
+                Check this box to include additional 'AddressFieldInfo' fields in the User table
+                ]]></ToolTip>
+            <DefaultValue>false</DefaultValue>
+        </PropertyItem>
+
+        <!-- ===== -->
+        <Separator/>
+
+        <PropertyItem key="Device.SupportFeatures" type="none">
+            <Description><![CDATA[
+                Additional 'Device' table fields:
+                ]]></Description>
+        </PropertyItem>
+  
+        <PropertyItem key="startupInit.Device.NotificationFieldInfo" type="boolean">
+            <Label><![CDATA[
+                'NotificationFieldInfo' Fields (Rule notification information)
+                ]]></Label>
+            <ToolTip><![CDATA[
+                Check this box to include additional 'NotificationFieldInfo' fields in the Device table
+                ]]></ToolTip>
+            <DefaultValue>false</DefaultValue>
+        </PropertyItem>
+  
+        <PropertyItem key="startupInit.Device.FixedLocationFieldInfo" type="boolean">
+            <Label><![CDATA[
+                'FixedLocationFieldInfo' Fields (for supporting non-movable assets)
+                ]]></Label>
+            <ToolTip><![CDATA[
+                Check this box to include additional 'FixedLocationFieldInfo' fields in the Device table
+                ]]></ToolTip>
+            <DefaultValue>false</DefaultValue>
+        </PropertyItem>
+  
+        <PropertyItem key="startupInit.Device.LinkFieldInfo" type="boolean">
+            <Label><![CDATA[
+                'LinkFieldInfo' (for supporting custom 'Device' links on the map)
+                ]]></Label>
+            <ToolTip><![CDATA[
+                Check this box to include additional 'LinkFieldInfo' fields in the Device table
+                ]]></ToolTip>
+            <DefaultValue>false</DefaultValue>
+        </PropertyItem>
+ 
+        <PropertyItem key="startupInit.Device.MaintOdometerFieldInfo" type="boolean">
+            <Label><![CDATA[
+                'MaintOdometerFieldInfo' Fields (for supporting periodic maintenance reports)
+                ]]></Label>
+            <ToolTip><![CDATA[
+                Check this box to include additional 'MaintOdometerFieldInfo' fields in the Device table
+                ]]></ToolTip>
+            <DefaultValue>false</DefaultValue>
+        </PropertyItem>
+  
+        <PropertyItem key="startupInit.Device.GeoCorridorFieldInfo" type="boolean">
+            <Label><![CDATA[
+                'GeoCorridorFieldInfo' Fields (GeoCorridor support - requires Event Notification Rules Engine)
+                ]]></Label>
+            <ToolTip><![CDATA[
+                Check this box to include additional 'GeoCorridorFieldInfo' fields in the Device table
+                ]]></ToolTip>
+            <DefaultValue>false</DefaultValue>
+        </PropertyItem>
+  
+        <PropertyItem key="startupInit.Device.DataPushInfo" type="boolean">
+            <Label><![CDATA[
+                'DataPushInfo' Fields ("lastDataPushTime" and "lastEventCreateMillis")
+                ]]></Label>
+            <ToolTip><![CDATA[
+                Check this box to include additional 'DataPushInfo' fields in the Device table
+                ]]></ToolTip>
+            <DefaultValue>false</DefaultValue>
+        </PropertyItem>
+
+        <!-- ===== -->
+        <Separator/>
+
+        <PropertyItem key="EventData.SupportFeatures" type="none">
+            <Description><![CDATA[
+                Additional 'EventData' table fields:
+                ]]></Description>
+        </PropertyItem>
+ 
+        <PropertyItem key="startupInit.EventData.AddressFieldInfo" type="boolean">
+            <Label><![CDATA[
+                'AddressFieldInfo' Fields (additional address information)
+                ]]></Label>
+            <ToolTip><![CDATA[
+                Check this box to include additional 'AddressFieldInfo' fields in the EventData table
+                ]]></ToolTip>
+            <DefaultValue>false</DefaultValue>
+        </PropertyItem>
+ 
+        <PropertyItem key="startupInit.EventData.GPSFieldInfo" type="boolean">
+            <Label><![CDATA[
+                'GPSFieldInfo' Fields (additional GPS accuracy information)
+                ]]></Label>
+            <ToolTip><![CDATA[
+                Check this box to include additional 'GPSFieldInfo' fields in the EventData table
+                ]]></ToolTip>
+            <DefaultValue>false</DefaultValue>
+        </PropertyItem>
+ 
+        <PropertyItem key="startupInit.EventData.CustomFieldInfo" type="boolean">
+            <Label><![CDATA[
+                'CustomFieldInfo' Fields (miscellaneous fields)
+                ]]></Label>
+            <ToolTip><![CDATA[
+                Check this box to include additional 'CustomFieldInfo' fields in the EventData table
+                ]]></ToolTip>
+            <DefaultValue>false</DefaultValue>
+        </PropertyItem>
+ 
+        <PropertyItem key="startupInit.EventData.ETAFieldInfo" type="boolean">
+            <Label><![CDATA[
+                'ETAFieldInfo' Fields (Garmin ETA fields)
+                ]]></Label>
+            <ToolTip><![CDATA[
+                Check this box to include additional 'ETAFieldInfo' fields in the EventData table
+                ]]></ToolTip>
+            <DefaultValue>false</DefaultValue>
+        </PropertyItem>
+
+        <PropertyItem key="startupInit.EventData.J1708FieldInfo" type="boolean">
+            <Label><![CDATA[
+                'J1708FieldInfo' Fields (J1708/J1939/OBDII/CANBus information)
+                ]]></Label>
+            <ToolTip><![CDATA[
+                Check this box to include additional 'J1708FieldInfo' fields in the EventData table
+                ]]></ToolTip>
+            <DefaultValue>false</DefaultValue>
+        </PropertyItem>
+
+        <PropertyItem key="startupInit.EventData.AtmosphereFieldInfo" type="boolean">
+            <Label><![CDATA[
+                'AtmosphereFieldInfo' Fields (Barometer, Ambient Temperature)
+                ]]></Label>
+            <ToolTip><![CDATA[
+                Check this box to include additional Atmosphere fields in the EventData table
+                ]]></ToolTip>
+            <DefaultValue>false</DefaultValue>
+        </PropertyItem>
+
+        <PropertyItem key="startupInit.EventData.ThermoFieldInfo" type="boolean">
+            <Label><![CDATA[
+                'ThermoFieldInfo' Fields (Temperature information)
+                ]]></Label>
+            <ToolTip><![CDATA[
+                Check this box to include additional Temperature fields in the EventData table
+                ]]></ToolTip>
+            <DefaultValue>false</DefaultValue>
+        </PropertyItem>
+
+        <PropertyItem key="startupInit.EventData.EndOfDaySummary" type="boolean">
+            <Label><![CDATA[
+                'EndOfDaySummary' Fields (End-Of-Day summary fields)
+                ]]></Label>
+            <ToolTip><![CDATA[
+                Check this box to include additional End-Of-Day summary fields in the EventData table
+                ]]></ToolTip>
+            <DefaultValue>false</DefaultValue>
+        </PropertyItem>
+
+        <PropertyItem key="startupInit.EventData.ServingCellTowerData" type="boolean">
+            <Label><![CDATA[
+                'ServingCellTowerData' Fields (Serving Cell Tower data fields)
+                ]]></Label>
+            <ToolTip><![CDATA[
+                Check this box to include additional Serving Cell Tower data fields in the EventData table
+                ]]></ToolTip>
+            <DefaultValue>false</DefaultValue>
+        </PropertyItem>
+
+        <PropertyItem key="startupInit.EventData.NeighborCellTowerData" type="boolean">
+            <Label><![CDATA[
+                'NeighborCellTowerData' Fields (Neighbor Cell Tower data fields)
+                ]]></Label>
+            <ToolTip><![CDATA[
+                Check this box to include additional Neighbor Cell Tower data fields in the EventData table
+                ]]></ToolTip>
+            <DefaultValue>false</DefaultValue>
+        </PropertyItem>
+
+        <!-- ===== -->
+        <Separator/>
+
+        <PropertyItem key="Geozone.SupportFeatures" type="none">
+            <Description><![CDATA[
+                Additional 'Geozone' table fields:
+                ]]></Description>
+        </PropertyItem>
+ 
+        <PropertyItem key="startupInit.Geozone.PriorityFieldInfo" type="boolean">
+            <Label><![CDATA[
+                'PriorityFieldInfo' Fields (support for overlapping Geozones)
+                ]]></Label>
+            <ToolTip><![CDATA[
+                Check this box to include additional 'PriorityFieldInfo' fields in the Geozone table
+                ]]></ToolTip>
+            <DefaultValue>false</DefaultValue>
+        </PropertyItem>
+
+        <!-- ===== -->
+        <Separator/>
+
+        <PropertyItem key="RuleList.SupportFeatures" type="none">
+            <Description><![CDATA[
+                Additional 'RuleList' table support (requires Event Notification Rules Engine):
+                ]]></Description>
+        </PropertyItem>
+ 
+        <PropertyItem key="RuleList.includeGroupRules" type="boolean">
+            <Label><![CDATA[
+                Enable Rule lookup by 'DeviceGroup'
+                ]]></Label>
+            <ToolTip><![CDATA[
+                Check this box to enable Rule lookup by DeviceGroup
+                ]]></ToolTip>
+            <DefaultValue>false</DefaultValue>
+        </PropertyItem>
+
+    </PropertyGroup>
+
+    <!-- =========================================================================== -->
+    <!-- Done ====================================================================== -->
+    <Completion><![CDATA[
+        <html>
+        <center>
+        <h2>The Configuration Process is Complete</h2>
+        <br>
+        <p>
+        Please press the "Save" button below to save your configuration changes.<br>
+        (Changes are saved to the file "config.conf")<br>
+        <br>
+        If any errors were detected, you will be given the oportunition to apply corrections.<br>
+        You can then try again to save your configuration.<br>
+        </p>
+        </center>
+        </html>
+    ]]></Completion>
+
+</GTSConfig>

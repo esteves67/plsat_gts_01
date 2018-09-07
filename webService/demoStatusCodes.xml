@@ -1,0 +1,7 @@
+<!-- 
+ === Request a list of all defined Status Codes.
+ -->
+<GTSRequest command="statuscodes">
+    <Authorization account="demo" user="admin" password=""/>
+</GTSRequest>
+

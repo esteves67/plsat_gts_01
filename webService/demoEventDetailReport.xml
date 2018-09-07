@@ -1,0 +1,16 @@
+<!-- 
+ === Requests an EventDetail report for device "demo2"
+ -->
+<GTSRequest command="report">
+    <Authorization account="demo" user="admin" password=""/>
+    <Report name="EventDetail" format="email">
+        <Device>demo</Device>
+        <TimeFrom>2010/03/12</TimeFrom>
+        <TimeTo>2010/03/12</TimeTo>
+    </Report>
+    <Report name="EventDetail" format="email">
+        <Device>demo2</Device>
+        <TimeFrom>-1d</TimeFrom> <!-- yesterday 00:00:00 -->
+        <TimeTo>-1d</TimeTo>     <!-- yesterday 23:59:59 -->
+    </Report>
+</GTSRequest>

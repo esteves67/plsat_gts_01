@@ -1,0 +1,77 @@
+#!/usr/bin/perl
+# -----------------------------------------------------------------------------
+# write data to specified UDP port
+# Usage:  writeUDP -host <host> -port <port> data ...
+# -----------------------------------------------------------------------------
+
+# --- global vars
+my $PrintSocket = undef;
+my $LOG_PORT = undef;
+
+# --- options
+use Getopt::Long;
+%argctl = (
+    "host:s" => \$LOG_HOST,
+    "port=i" => \$LOG_PORT
+);
+if (!&GetOptions(%argctl) || !$LOG_PORT || ($LOG_PORT <= 0)) {
+    print "Usage: $0 [-help] -port <port> <AsciiTestData>\n";
+    print "  -h[ost] <host>  Host name\n";
+    print "  -p[ort] <port>  Log port number\n";
+    exit(1);
+}
+
+# --- send command
+#&sendData(hex($DATA));
+
+# --- send command
+my $DATA = join(' ', @ARGV);
+&sendData($DATA);
+
+# --- done
+&closeLog();
+exit(0);
+
+# -----------------------------------------------------------------------------
+use IO::Socket;
+
+sub openLog(\$) {
+    my ($host,$port) = @_;
+    &closeLog();
+    if ($host eq "broadcast") {
+        $PrintSocket = IO::Socket::INET->new(
+            PeerAddr=>inet_ntoa(INADDR_BROADCAST), 
+            PeerPort=>$port, 
+            Proto=>"udp", 
+            Broadcast => 1);
+    } else {
+        $PrintSocket = IO::Socket::INET->new(
+            PeerAddr=>$host, 
+            PeerPort=>$port, 
+            Proto=>"udp");
+    }
+    if ($PrintSocket) {
+        print "Opened ${host}:${port} ...\n";
+    } else {
+        print "Unable to open ${host}:${port} ...\n";
+    }
+    return $PrintSocket;
+}
+
+sub closeLog() {
+    if ($PrintSocket) {
+        $PrintSocket->close();
+        $PrintSocket = undef;
+    }
+}
+
+sub sendData(\$) {
+    my ($cmd) = @_;
+    print "Sending command: $cmd\n";
+    if (!$PrintSocket) { 
+        &openLog($LOG_HOST,$LOG_PORT); 
+    }
+    $PrintSocket->send($cmd, 0);
+}
+
+

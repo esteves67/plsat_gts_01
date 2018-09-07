@@ -1,0 +1,103 @@
+#!/bin/bash
+# This is the init script for starting up the
+#  Jakarta Tomcat server
+# -----------------------------------------------------------------------------
+# This file should installed as follows:
+#   % cp $GTS_HOME/bin/onboot/fedora/tomcat /etc/init.d/.
+#   % chkconfig --add tomcat
+#   % chkconfig tomcat on
+#   % chkconfig --list tomcat
+# Restart service
+#   % service tomcat restart
+# -----------------------------------------------------------------------------
+#
+# chkconfig: 345 91 10
+# description: Starts and stops the Apache Tomcat daemon.
+#
+
+# -- GTS installation directory
+GTS_INSTALL_DIR="/usr/local"
+
+# -- Source function library.
+. /etc/rc.d/init.d/functions
+
+# -- Get config.
+. /etc/sysconfig/network
+
+# -- Check that networking is up.
+[ "${NETWORKING}" = "no" ] && exit 0
+
+# -- Load GTS_HOME, CATALINA_HOME, JAVA_HOME, ANT_HOME environment vars
+GTS_VARS_ENV="${GTS_INSTALL_DIR}/gts_vars.env"
+if [ ! -f "${GTS_VARS_ENV}" ]; then
+    action $"Tomcat: missing env file '${GTS_VARS_ENV}': " /bin/false
+    RETVAL=1
+    exit ${RETVAL}
+fi
+. ${GTS_VARS_ENV}
+
+# -- check TOMCAT_USER
+if [ "${TOMCAT_USER}" = "" ]; then
+    action $"Tomcat: TOMCAT_USER undefined: " /bin/false
+    RETVAL=1
+    exit ${RETVAL}
+fi
+
+# -- check CATALINA_HOME
+if [ "${CATALINA_HOME}" = "" ]; then
+    action $"Tomcat: CATALINA_HOME undefined: " /bin/false
+    RETVAL=1
+    exit ${RETVAL}
+fi
+
+# --
+start() {
+    echo "Starting Tomcat ..."
+    /bin/su ${TOMCAT_USER} -c ${CATALINA_HOME}/bin/startup.sh
+    RETVAL=$?
+    if [ $RETVAL -eq 0 ]; then
+        action $"Started Tomcat "  /bin/true
+    else
+        action $"Tomcat failed to start "  /bin/false
+    fi
+}
+
+# --
+stop() {
+    echo "Stopping Tomcat ... "
+    /bin/su ${TOMCAT_USER} -c ${CATALINA_HOME}/bin/shutdown.sh
+    RETVAL=$?
+    if [ $RETVAL -eq 0 ]; then
+        action $"Stopped Tomcat "  /bin/true
+    else
+        action $"Tomcat failed to stop "  /bin/false
+    fi
+}
+
+# -- check command-line args
+case "$1" in
+
+    start )
+        start
+        ;;
+
+    stop )
+        stop
+        ;;
+
+    status )
+        #status tomcat
+        ;;
+
+    restart )
+        stop
+        start
+        ;;
+
+    *)
+        echo $"Usage: $0 {start|stop|restart}"
+        exit 1
+
+esac
+exit 0
+

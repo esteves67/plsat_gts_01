@@ -1,0 +1,29 @@
+
+BODY { 
+  background-color: #91A5Ba; 
+  margin-top: 0px; 
+  margin-bottom: 0px; 
+  margin-left: 0px; 
+  margin-right: 0px; 
+  font-size: 8pt; 
+  font-family: verdana,sans-serif; 
+}
+
+/* banner header table */
+TABLE.bannerTable {
+  /*background-color: #FFFFFF; */
+}
+
+/* centered banner image */
+TD.bannerImageCenter {
+  text-align: center;
+  padding-top: 5px;
+}
+
+/* multiple banner images */
+TD.bannerImage1 {
+    /* TBD */
+}
+TD.bannerImage2 {
+    /* TBD */
+}

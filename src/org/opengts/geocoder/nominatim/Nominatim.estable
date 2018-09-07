@@ -1,0 +1,2030 @@
+// ----------------------------------------------------------------------------
+// Copyright 2007-2014, OpenGTS
+// All rights reserved
+// ----------------------------------------------------------------------------
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+// http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// ----------------------------------------------------------------------------
+// Notes:
+//  - http://wiki.openstreetmap.org/wiki/Nominatim
+//  - http://open.mapquestapi.com/nominatim/
+//  - http://nominatim.openstreetmap.org
+//  - OpenStreetMap "Nominative Usage Policy" can be found at the following link: 
+//      http://wiki.openstreetmap.org/wiki/Nominatim_usage_policy
+// ----------------------------------------------------------------------------
+// Example
+//  - http://nominatim.openstreetmap.org/reverse?format=xml&lat=46.17330&lon=21.29370&zoom=18&addressdetails=1
+//  - http://open.mapquestapi.com/nominatim/v1/reverse?format=xml&lat=46.17330&lon=21.29370&zoom=18&addressdetails=1
+//   <?xml version="1.0" encoding="UTF-8" ?>
+//   <reversegeocode timestamp='Sat, 08 Jan 11 01:43:35 -0500' 
+//      attribution='Data Copyright OpenStreetMap Contributors, Some Rights Reserved. CC-BY-SA 2.0.' 
+//      querystring='format=xml&amp;lat=46.17330&amp;lon=21.29370&amp;zoom=18&amp;addressdetails=1'>
+//      <result place_id="25016501" osm_type="way" osm_id="17508617">P?durii, Arad, 310365, Romania</result>
+//      <addressparts>
+//          <tram>P?durii</tram>
+//          <road>P?durii</road>
+//          <residential>Arad</residential>
+//          <city>Arad</city>
+//          <postcode>310365</postcode>
+//          <country>Romania</country>
+//          <country_code>ro</country_code>
+//      </addressparts>
+//   </reversegeocode>
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+package org.opengts.geocoder.nominatim;
+
+import java.io.*;
+import java.util.Date;
+import javax.xml.parsers.*;
+import org.w3c.dom.*;
+import org.xml.sax.*;
+import org.opengts.util.*;
+import org.opengts.geocoder.*;
+
+public class Nominatim
+    extends ReverseGeocodeProviderAdapter
+    implements ReverseGeocodeProvider
+{
+   
+    // ------------------------------------------------------------------------
+    // TAGs
+    
+    protected static final String TAG_reversegeocode            = "reversegeocode";     // main tag
+    protected static final String TAG_result                    = "result";             // full address
+    protected static final String TAG_addressparts              = "addressparts";       // address components
+    protected static final String TAG_house                     = "house";              // 
+    protected static final String TAG_tram                      = "tram";               // same as road?
+    protected static final String TAG_road                      = "road";               // 
+    protected static final String TAG_residential               = "residential";        // same as city?
+    protected static final String TAG_village                   = "village";            // 
+    protected static final String TAG_town                      = "town";               // alternate for city?
+    protected static final String TAG_city                      = "city";               // 
+    protected static final String TAG_county                    = "county";             // 
+    protected static final String TAG_postcode                  = "postcode";           // 
+    protected static final String TAG_hamlet                    = "hamlet";             // Wherefor art thou?
+    protected static final String TAG_state                     = "state";              // 
+    protected static final String TAG_state_district            = "state_district";     // 
+    protected static final String TAG_country                   = "country";            // Country name
+    protected static final String TAG_country_code              = "country_code";       // Country code
+    
+    protected static final String ATTR_osm_type                 = "osm_type";
+
+    // ------------------------------------------------------------------------
+
+    protected static final String PROP_reverseURL               = "reverseURL";      // String: "http://localhost:8081/reverse?"
+    protected static final String PROP_hostName                 = "host";            // String: "localhost:8081"
+    protected static final String PROP_zoom                     = "zoom";            // String: "18"
+    protected static final String PROP_addressdetails           = "addressdetails";  // String: "1"
+    protected static final String PROP_email                    = "email";           // String: "joe@example.com"
+
+    protected static       String HOST_OPENSTREETMAP            = "nominatim.openstreetmap.org";
+    protected static       String HOST_MAPQUEST                 = "open.mapquestapi.com";
+    protected static       String HOST_PRIMARY                  = HOST_MAPQUEST;
+
+    // ------------------------------------------------------------------------
+
+    protected static final String ENCODING_UTF8                 = StringTools.CharEncoding_UTF_8;
+
+    // ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
+
+    /**
+    *** Constructor
+    *** @param name    The name assigned to this ReverseGeocodeProvider
+    *** @param key     The optional authorization key
+    *** @param rtProps The properties associated with this ReverseGeocodeProvider
+    **/
+    public Nominatim(String name, String key, RTProperties rtProps)
+    {
+        super(name, key, rtProps);
+    }
+
+    // ------------------------------------------------------------------------
+
+    /**
+    *** Returns true if locally resolved, false otherwise.
+    *** (ie. remote address resolution takes more than 20ms to complete)
+    *** @return true if locally resolved, false otherwise.
+    **/
+    public boolean isFastOperation() 
+    {
+        // this is a slow operation
+        return super.isFastOperation();
+    }
+
+    /**
+    *** Returns a ReverseGeocode instance for the specified GeoPoint
+    *** @param gp  The GeoPoint
+    *** @return The ReverseGeocode instance
+    **/
+    public ReverseGeocode getReverseGeocode(GeoPoint gp, String localeStr, boolean cache) 
+    {
+        ReverseGeocode rg = this.getAddressReverseGeocode(gp, localeStr, cache);
+        return rg;
+    }
+
+    /* return subdivision */
+    public String getSubdivision(GeoPoint gp) 
+    {
+        throw new UnsupportedOperationException("Not supported");
+    }
+
+    // ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
+
+    /**
+    *** Returns a ReverseGeocode instance containing address information
+    *** @param gp  The GeoPoint
+    *** @return The ReverseGeocode instance
+    **/
+    private ReverseGeocode getAddressReverseGeocode(GeoPoint gp, String localeStr, boolean cache) 
+    {
+
+        /* URL */
+        String url = this.getAddressReverseGeocodeURL(gp);
+        Print.logInfo("Address URL: " + url);
+
+        /* create XML document */
+        Document xmlDoc = GetXMLDocument(url);
+        if (xmlDoc == null) {
+            return null;
+        }
+
+        /* create ReverseGeocode response */
+        Element reversegeocode = xmlDoc.getDocumentElement();
+        if (!reversegeocode.getTagName().equalsIgnoreCase(TAG_reversegeocode)) {
+            return null;
+        }
+        
+        /* init */
+        String address_val      = null;     // null address
+        String house_val        = null;     // house number
+        String road_val         = null;     // street name
+        String city_val         = null;     // city name
+        String county_val       = null;     // county name
+        String state_val        = null;     // state/province
+        String postcode_val     = null;     // postal code
+        String country_name_val = null;     // country name
+        String country_code_val = null;     // country code
+
+        // full address
+        NodeList resultList = XMLTools.getChildElements(reversegeocode,TAG_result);
+        for (int r = 0; r < resultList.getLength(); r++) {
+            Element result = (Element)resultList.item(r);
+            //String osmType = XMLTools.getAttribute(result, ATTR_osm_type, null, false);
+            address_val = XMLTools.getNodeText(result," ",false);
+            break; // only the first element
+        }
+
+        // address components
+        NodeList addresspartsList = XMLTools.getChildElements(reversegeocode,TAG_addressparts);
+        for (int a = 0; (a < addresspartsList.getLength()); a++) {
+            Element addressparts = (Element)addresspartsList.item(a);
+            NodeList addresspartsChildren = addressparts.getChildNodes();
+            for (int ac = 0; ac < addresspartsChildren.getLength(); ac++) {
+                Node child = addresspartsChildren.item(ac);
+                if (!(child instanceof Element)) { continue; }
+                Element elem = (Element)child;
+                String elemName = elem.getNodeName();
+                if (elemName.equalsIgnoreCase(TAG_house)) {
+                    house_val = XMLTools.getNodeText(elem," ",false);
+                } else
+                if (elemName.equalsIgnoreCase(TAG_tram)) {
+                    // ignore
+                } else
+                if (elemName.equalsIgnoreCase(TAG_road)) {
+                    road_val = XMLTools.getNodeText(elem," ",false);
+                } else
+                if (elemName.equalsIgnoreCase(TAG_residential)) {
+                    // ignore
+                } else
+                if (elemName.equalsIgnoreCase(TAG_village)) {
+                    // ignore
+                } else
+                if (elemName.equalsIgnoreCase(TAG_town)) {
+                    if (StringTools.isBlank(city_val)) {
+                        city_val = XMLTools.getNodeText(elem," ",false);
+                    }
+                } else
+                if (elemName.equalsIgnoreCase(TAG_city)) {
+                    city_val = XMLTools.getNodeText(elem," ",false);
+                } else
+                if (elemName.equalsIgnoreCase(TAG_county)) {
+                    county_val = XMLTools.getNodeText(elem," ",false);
+                } else
+                if (elemName.equalsIgnoreCase(TAG_postcode)) {
+                    postcode_val = XMLTools.getNodeText(elem," ",false);
+                } else
+                if (elemName.equalsIgnoreCase(TAG_state)) {
+                    state_val = XMLTools.getNodeText(elem," ",false);
+                } else
+                if (elemName.equalsIgnoreCase(TAG_country)) {
+                    country_name_val = XMLTools.getNodeText(elem," ",false);
+                } else
+                if (elemName.equalsIgnoreCase(TAG_country_code)) {
+                    country_code_val = StringTools.trim(XMLTools.getNodeText(elem," ",false)).toUpperCase();
+                } else {
+                    // elemName unrecognized
+                }
+            }
+            break; // only the first element
+        }
+
+        /* populate ReverseGeocode instance */
+        ReverseGeocode rg = new ReverseGeocode();
+        StringBuffer addr = new StringBuffer();
+        // house number /road
+        if (!StringTools.isBlank(house_val)) {
+            addr.append(house_val);
+            if (!StringTools.isBlank(road_val)) {
+                addr.append(" ");
+                addr.append(road_val);
+                rg.setStreetAddress(house_val + " " + road_val);
+            } else {
+                rg.setStreetAddress(house_val);
+            }
+        } else
+        if (!StringTools.isBlank(road_val)) {
+            addr.append(road_val);
+            rg.setStreetAddress(road_val);
+        }
+        // city/county
+        if (!StringTools.isBlank(city_val)) {
+            if (addr.length() > 0) { addr.append(", "); }
+            addr.append(city_val);
+            rg.setCity(city_val);
+        }
+        if (!StringTools.isBlank(county_val)) {
+            if (StringTools.isBlank(city_val)) {
+                // "city" not provided, at least include the "county"
+                if (addr.length() > 0) { addr.append(", "); }
+                addr.append("[").append(county_val).append("]");
+            }
+            //rg.setCounty(county_val);
+        }
+        // state/province
+        if (!StringTools.isBlank(state_val)) {
+            if (addr.length() > 0) { addr.append(", "); }
+            addr.append(state_val);
+            rg.setStateProvince(state_val);
+            if (!StringTools.isBlank(postcode_val)) {
+                addr.append(" ").append(postcode_val);
+                rg.setPostalCode(postcode_val);
+            }
+        } else {
+            if (!StringTools.isBlank(postcode_val)) {
+                if (addr.length() > 0) { addr.append(", "); }
+                addr.append(postcode_val);
+                rg.setPostalCode(postcode_val);
+            }
+        }
+        // country
+        if (!StringTools.isBlank(country_code_val)) {
+            if (country_code_val.equalsIgnoreCase("US")) {
+                //if (addr.length() > 0) { addr.append(", "); }
+                //addr.append("USA");
+            } else
+            if (!StringTools.isBlank(country_name_val)) {
+                if (addr.length() > 0) { addr.append(", "); }
+                addr.append(country_name_val);
+            } else {
+                if (addr.length() > 0) { addr.append(", "); }
+                addr.append(country_code_val);
+            }
+            rg.setCountryCode(country_code_val);
+        }
+        // full address
+        rg.setFullAddress(addr.toString());
+
+        return rg;
+    
+    }
+
+    private String getEmail()
+    {
+        return this.getProperties().getString(PROP_email,null);
+    }
+
+    private String getAddressReverseGeocodeURL(GeoPoint gp) 
+    {
+        //  - http://nominatim.openstreetmap.org/reverse?format=xml&addressdetails=1&zoom=18&lat=46.17330&lon=21.29370
+        StringBuffer sb = new StringBuffer();
+//        StringBuffer sbf = new StringBuffer();
+        RTProperties rtp = this.getProperties();
+        String url = rtp.getString(PROP_reverseURL, null);
+        if (!StringTools.isBlank(url)) {
+            sb.append(url);
+        } else {
+            String host = rtp.getString(PROP_hostName, HOST_PRIMARY);
+            sb.append("http://");
+            sb.append(host);
+            if (host.indexOf("mapquest") >= 0) {
+                sb.append("/nominatim/v1/reverse?");
+            } else {
+                sb.append("/reverse?");
+            }
+        }
+//        sbf.append("http://nominatim.openstreetmap.org/reverse?");
+//        sb.append("http://nominatim.openstreetmap.org/reverse?");
+        sb.append("format=xml&");
+//        sbf.append("format=xml&");
+        sb.append("limit=1&");
+
+        Date d = new Date();
+//        Print.logInfo("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  : " + d);
+        int curr_seconds = d.getSeconds();
+        String seconds_str = Integer.toString(curr_seconds);
+//        Print.logInfo("::::::::::::" + curr_seconds + ":::" + seconds_str);
+
+/*        if(curr_seconds%2==0){
+          sb.append("key=AgRlo70bjPCk7XSfalxkMFhxgRAjzHWw&");
+//          sb.append("key=bhF7eaPAz2cZEqF6LJriN44ETcXGZxAh&");
+        }else{
+          sb.append("key=Zq6AWe7k4RBImh4IcOCACIC4wvf2UGWY&");
+        }
+*/
+/*
+        if(curr_seconds >= 0 && curr_seconds <= 4){
+          sb.append("key=aKZCQjW0NQNjWjfaBnXTfCoNTgjBrqVA&");
+        }
+        if(curr_seconds >= 5 && curr_seconds <= 9){
+          sb.append("key=ksYSjYTNB5ixVolVYrB8cjZqCgrDDMnT&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 14){
+          sb.append("key=PjaQM5K9OkmO3ycLmDX1Pmw0TTSvIenI&");
+        }
+        if(curr_seconds >= 15 && curr_seconds <= 19){
+          sb.append("key=lClVkGm430BvQPBX1ehjsIfTvBxGmLAG&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 24){
+          sb.append("key=lttlVQmY3axpocu6IB7Zy0t62yIRSG9R&");
+        }
+        if(curr_seconds >= 25 && curr_seconds <= 29){
+          sb.append("key=9iSVtFZl9CBwk1XAjoDBQ549RXjqHiEn&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 34){
+          sb.append("key=9ZD7xUkvTQ7G7O22q6nEJg65nYftdlZ6&");
+        }
+        if(curr_seconds >= 35 && curr_seconds <= 39){
+          sb.append("key=742GwWM6ZTr4A7rz7cXEhnGgwx8D4jPq&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 44){
+          sb.append("key=8zsCgEDZ4c5nLI4BDAGQlooV11vvIE63&");
+        }
+        if(curr_seconds >= 45 && curr_seconds <= 49){
+          sb.append("key=EVnBzTbIuZsHyCutdCuemxbwvuGg90FZ&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 54){
+          sb.append("key=x7F6WTZaMGFUuaVinl9bdpVR0YfeSEeJ&");
+        }
+        if(curr_seconds >= 55 && curr_seconds <= 59){
+          sb.append("key=eEaKEO5Adi9Du0SfcwmnV8jtGlo7AKBP&");
+        }
+*/
+/*
+        if(curr_seconds >= 0 && curr_seconds <= 4){
+          sb.append("key=Zq6AWe7k4RBImh4IcOCACIC4wvf2UGWY&");
+        }
+        if(curr_seconds >= 5 && curr_seconds <= 9){
+          sb.append("key=BKSgCFse5TqyzuL4s5inFQsGfpqRCB9o&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 14){
+          sb.append("key=oUSmRBYNWUmvGYO5ZRAYy6LSGAXEbyBN&");
+        }
+        if(curr_seconds >= 15 && curr_seconds <= 19){
+          sb.append("key=UEwdGYPSxs5WVFGQy82S3adXgCYqKO4A&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 24){
+          sb.append("key=LDsmGCIPWjtcQ4loPAg2A1cs7EHwqu63&");
+        }
+        if(curr_seconds >= 25 && curr_seconds <= 29){
+          sb.append("key=Ln2TqujrM35A1DGaTJmSLELSsryGDIoI&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 34){
+          sb.append("key=SnJcd6fPGFdMAW7a640sJwxSwzuyQe7d&");
+        }
+        if(curr_seconds >= 35 && curr_seconds <= 39){
+          sb.append("key=habk0du89i2nHCaqM7ELQldK8zdgoKJW&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 44){
+          sb.append("key=2vzXYPiB6y4AkmyilbiT0wtJ8rqONO7A&");
+        }
+        if(curr_seconds >= 45 && curr_seconds <= 49){
+          sb.append("key=4OSXRArsMEbcIcmDmnKbwdQmaGAthLHr&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 54){
+          sb.append("key=IhAPneXT1Nsap2jtO8RENurF3t1nRX22&");
+        }
+        if(curr_seconds >= 55 && curr_seconds <= 59){
+          sb.append("key=FZbkSESMlBik4cMeYmBIxivwD9dYE4od&");
+        }
+*/
+/*
+        if(curr_seconds >= 0 && curr_seconds <= 10){
+          sb.append("key=Zq6AWe7k4RBImh4IcOCACIC4wvf2UGWY&");
+//          sb.append("key=AwsUKBpdZt1USgvzQAJrJbbvSHh0xW3W&");
+        }
+        if(curr_seconds >= 11 && curr_seconds <= 20){
+          sb.append("key=BKSgCFse5TqyzuL4s5inFQsGfpqRCB9o&");
+        }
+        if(curr_seconds >= 21 && curr_seconds <= 30){
+          sb.append("key=oUSmRBYNWUmvGYO5ZRAYy6LSGAXEbyBN&");
+        }
+        if(curr_seconds >= 31 && curr_seconds <= 40){
+          sb.append("key=UEwdGYPSxs5WVFGQy82S3adXgCYqKO4A&");
+        }
+        if(curr_seconds >= 41 && curr_seconds <= 50){
+          sb.append("key=LDsmGCIPWjtcQ4loPAg2A1cs7EHwqu63&");
+        }
+        if(curr_seconds >= 51 && curr_seconds <= 59){
+          sb.append("key=Ln2TqujrM35A1DGaTJmSLELSsryGDIoI&");
+        }
+*/
+/*
+        if(curr_seconds >= 0 && curr_seconds <= 14){
+          sb.append("key=SnJcd6fPGFdMAW7a640sJwxSwzuyQe7d&");
+        }
+        if(curr_seconds >= 15 && curr_seconds <= 29){
+          sb.append("key=habk0du89i2nHCaqM7ELQldK8zdgoKJW&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 44){
+          sb.append("key=2vzXYPiB6y4AkmyilbiT0wtJ8rqONO7A&");
+        }
+        if(curr_seconds >= 45 && curr_seconds <= 59){
+          sb.append("key=4OSXRArsMEbcIcmDmnKbwdQmaGAthLHr&");
+        }
+*/
+/*
+        if(curr_seconds >= 0 && curr_seconds <= 9){
+          sb.append("key=IhAPneXT1Nsap2jtO8RENurF3t1nRX22&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 19){
+          sb.append("key=FZbkSESMlBik4cMeYmBIxivwD9dYE4od&");
+*/
+/***/
+/*
+        if(curr_seconds >= 0 && curr_seconds <= 4){
+          sb.append("key=8Mm0tvcif9eiUUzaJf0ztMaQgcwM1qGD&");
+        }
+        if(curr_seconds >= 5 && curr_seconds <= 9){
+          sb.append("key=AWoEgJKHzNgCfgtFwRIge4BIypYPMgTd&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 14){
+          sb.append("key=yEK0fxeqtHl5946mMPiNpYLrkAMvGLPr&");
+        }
+        if(curr_seconds >= 15 && curr_seconds <= 19){
+          sb.append("key=kLdCxuc8Vl3w2YS1UyiQgfpFUxDOtDRO&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 24){
+          sb.append("key=TRXuC6W33dxCCZJJAlBdgQlRRrW7dr7a&");
+        }
+        if(curr_seconds >= 25 && curr_seconds <= 29){
+          sb.append("key=vGjKmkQmnIZI0TODZDBFjs4RG8SlfeVU&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 34){
+          sb.append("key=BkSmMAqova4CpN500JGWQaQy5zfZJLQv&");
+        }
+        if(curr_seconds >= 35 && curr_seconds <= 39){
+          sb.append("key=oc3SqIw24LU7CTEGH80O46yDILxJ3tDQ&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 44){
+          sb.append("key=IhLdG8mxYwkl3PYWLTYi5goOQ9LRgcAg&");
+        }
+        if(curr_seconds >= 45 && curr_seconds <= 49){
+          sb.append("key=gWqhWvneerkHcrDAvQrFgjPHYHppEasT&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 54){
+          sb.append("key=V4sUqSopfClXrcQ9nMPrtxGQ1Lq0KwIv&");
+        }
+        if(curr_seconds >= 55 && curr_seconds <= 59){
+          sb.append("key=xRbs2wYwlp8cnOv7HGf1zZJmnUjlq79A&");
+        }
+*/
+/*
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 29){
+          sb.append("key=8Mm0tvcif9eiUUzaJf0ztMaQgcwM1qGD&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 39){
+          sb.append("key=AWoEgJKHzNgCfgtFwRIge4BIypYPMgTd&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 49){
+          sb.append("key=yEK0fxeqtHl5946mMPiNpYLrkAMvGLPr&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 59){
+          sb.append("key=kLdCxuc8Vl3w2YS1UyiQgfpFUxDOtDRO&");
+        }
+*/
+
+/*
+        if(curr_seconds >= 0 && curr_seconds <= 11){
+          sb.append("key=TRXuC6W33dxCCZJJAlBdgQlRRrW7dr7a&");
+        }
+        if(curr_seconds >= 12 && curr_seconds <= 23){
+          sb.append("key=vGjKmkQmnIZI0TODZDBFjs4RG8SlfeVU&");
+        }
+        if(curr_seconds >= 24 && curr_seconds <= 35){
+          sb.append("key=BkSmMAqova4CpN500JGWQaQy5zfZJLQv&");
+        }
+        if(curr_seconds >= 36 && curr_seconds <= 47){
+          sb.append("key=oc3SqIw24LU7CTEGH80O46yDILxJ3tDQ&");
+        }
+        if(curr_seconds >= 48 && curr_seconds <= 59){
+          sb.append("key=IhLdG8mxYwkl3PYWLTYi5goOQ9LRgcAg&");
+        }
+*/
+/*
+        if(curr_seconds >= 0 && curr_seconds <= 9){
+          sb.append("key=gWqhWvneerkHcrDAvQrFgjPHYHppEasT&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 19){
+          sb.append("key=V4sUqSopfClXrcQ9nMPrtxGQ1Lq0KwIv&");
+        }
+
+       if(curr_seconds >= 20 && curr_seconds <= 29){
+          sb.append("key=xRbs2wYwlp8cnOv7HGf1zZJmnUjlq79A&");
+        }
+*/
+
+/***/
+/*
+        if(curr_seconds >= 0 && curr_seconds <= 4){
+          sb.append("key=LZ0R5AwhVWllqoWjIOQPohh5PvrkrWxm&");
+        }
+        if(curr_seconds >= 5 && curr_seconds <= 9){
+          sb.append("key=tLTLETweQRbIBueJATwwj7zDHz0F0rxA&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 14){
+          sb.append("key=XFR5DUSuSm0o3bFNlHj8fA7UACBjRGQW&");
+        }
+        if(curr_seconds >= 15 && curr_seconds <= 19){
+          sb.append("key=Tr6FwlNtzQWcAZtGoLYMARHowM5uHa7r&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 24){
+          sb.append("key=PDhNNKHy4XscHxUpCZgNA0fw7ntLGJ8w&");
+        }
+        if(curr_seconds >= 25 && curr_seconds <= 29){
+          sb.append("key=12GngZoJEGKOjgGgRc6RahzJppoDbTsO&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 34){
+          sb.append("key=AGF4EBjPkXWj1yVC0OJGlnFhMSTrcTEi&");
+        }
+        if(curr_seconds >= 35 && curr_seconds <= 39){
+          sb.append("key=2KQg40fBNB0rrRlU9Moon3MfCXa3znNE&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 44){
+          sb.append("key=kK7WGuAE0zb9MTxGWDhuh05K5xpx6EtS&");
+        }
+        if(curr_seconds >= 45 && curr_seconds <= 49){
+          sb.append("key=rf3hOUj7kuZ4l617uD1VSeGNFaAgaX8w&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 54){
+          sb.append("key=RQ7t6OXauPAfQX3K3G7uQ2IBzhSLfTl3&");
+        }
+        if(curr_seconds >= 55 && curr_seconds <= 59){
+          sb.append("key=9iHFvogF7BeI06J1VqqsEtA2G4T2ZteC&");
+        }
+*/
+/*
+        if(curr_seconds >= 30 && curr_seconds <= 39){
+          sb.append("key=LZ0R5AwhVWllqoWjIOQPohh5PvrkrWxm&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 49){
+          sb.append("key=tLTLETweQRbIBueJATwwj7zDHz0F0rxA&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 59){
+          sb.append("key=XFR5DUSuSm0o3bFNlHj8fA7UACBjRGQW&");
+        }
+*/
+/*
+        if(curr_seconds >= 0 && curr_seconds <= 9){
+          sb.append("key=Tr6FwlNtzQWcAZtGoLYMARHowM5uHa7r&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 19){
+          sb.append("key=PDhNNKHy4XscHxUpCZgNA0fw7ntLGJ8w&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 29){
+          sb.append("key=12GngZoJEGKOjgGgRc6RahzJppoDbTsO&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 39){
+          sb.append("key=AGF4EBjPkXWj1yVC0OJGlnFhMSTrcTEi&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 49){
+          sb.append("key=2KQg40fBNB0rrRlU9Moon3MfCXa3znNE&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 59){
+          sb.append("key=kK7WGuAE0zb9MTxGWDhuh05K5xpx6EtS&");
+        }
+*/
+/*
+        if(curr_seconds >= 0 && curr_seconds <= 9){
+          sb.append("key=rf3hOUj7kuZ4l617uD1VSeGNFaAgaX8w&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 19){
+          sb.append("key=RQ7t6OXauPAfQX3K3G7uQ2IBzhSLfTl3&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 29){
+          sb.append("key=9iHFvogF7BeI06J1VqqsEtA2G4T2ZteC&");
+        }
+/***/
+
+/*
+        if(curr_seconds >= 0 && curr_seconds <= 4){
+          sb.append("key=k9TMdTdGIGwXrOekKWtqpf1wjDBTszXI&");
+        }
+        if(curr_seconds >= 5 && curr_seconds <= 9){
+          sb.append("key=PWewm2VG9R7yJqGgfu8viCbWNt6xAXLG&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 14){
+          sb.append("key=cvXAZkwqUSkkkTNColFgWbtECLqO9iSk&");
+        }
+        if(curr_seconds >= 15 && curr_seconds <= 19){
+          sb.append("key=91OkO3fuF96UMCIT5kkiiTsvkfDPIbTQ&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 24){
+          sb.append("key=APFxP3d1RbACryXbALlRQKEA5T9jV9qG&");
+        }
+        if(curr_seconds >= 25 && curr_seconds <= 29){
+          sb.append("key=GKuUooAaOMK8UILiUF6PKqhGmyeLBZ3g&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 34){
+          sb.append("key=scVxQF2PNWMWbjlZNP9NyxHi6Tk0ROAZ&");
+        }
+        if(curr_seconds >= 35 && curr_seconds <= 39){
+          sb.append("key=ZXG9YowwmGlBEycxXuAHBGL3eOZ4IQ3B&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 44){
+          sb.append("key=NqScBvn2R4cyMTpxjUQ8XGMoa9Sx8Vpz&");
+        }
+        if(curr_seconds >= 45 && curr_seconds <= 49){
+          sb.append("key=UtUHFTzDsG1PFg1ip8IqHzfzraWfeO4g&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 54){
+          sb.append("key=WLIcyOfDsMiNmLeGdaqTOlMlJlFIAbBM&");
+        }
+        if(curr_seconds >= 55 && curr_seconds <= 59){
+          sb.append("key=v9mLfblLEBIcR5E4a9XjRWljDOIGBxdF&");
+        }
+
+
+        if(curr_seconds >= 30 && curr_seconds <= 39){
+          sb.append("key=PWewm2VG9R7yJqGgfu8viCbWNt6xAXLG&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 49){
+          sb.append("key=k9TMdTdGIGwXrOekKWtqpf1wjDBTszXI&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 59){
+          sb.append("key=cvXAZkwqUSkkkTNColFgWbtECLqO9iSk&");
+        }
+        if(curr_seconds >= 0 && curr_seconds <= 9){
+          sb.append("key=91OkO3fuF96UMCIT5kkiiTsvkfDPIbTQ&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 19){
+          sb.append("key=APFxP3d1RbACryXbALlRQKEA5T9jV9qG&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 29){
+          sb.append("key=GKuUooAaOMK8UILiUF6PKqhGmyeLBZ3g&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 39){
+          sb.append("key=scVxQF2PNWMWbjlZNP9NyxHi6Tk0ROAZ&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 49){
+          sb.append("key=ZXG9YowwmGlBEycxXuAHBGL3eOZ4IQ3B&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 59){
+          sb.append("key=NqScBvn2R4cyMTpxjUQ8XGMoa9Sx8Vpz&");
+        }
+
+        if(curr_seconds >= 0 && curr_seconds <= 9){
+          sb.append("key=UtUHFTzDsG1PFg1ip8IqHzfzraWfeO4g&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 19){
+          sb.append("key=WLIcyOfDsMiNmLeGdaqTOlMlJlFIAbBM&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 29){
+          sb.append("key=v9mLfblLEBIcR5E4a9XjRWljDOIGBxdF&");
+*/
+
+
+/***/
+/*
+        if(curr_seconds >= 0 && curr_seconds <= 4){
+          sb.append("key=ajC8yen0tsXlVZpTIZKhbiXE9GvkeAI4&");
+        }
+        if(curr_seconds >= 5 && curr_seconds <= 9){
+          sb.append("key=gAi9J5PXky1e3SkIZO4G3jgrAeDVg0co&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 14){
+          sb.append("key=vtIXe4tZaElhYe9dQ3xLghTboscefItR&");
+        }
+        if(curr_seconds >= 15 && curr_seconds <= 19){
+          sb.append("key=IIWezVSCDaSsi9yttcPYjidgziugm3Dj&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 24){
+          sb.append("key=AYRg0NvTVGsLSIWgYjIHoR4akAqaevBP&");
+        }
+        if(curr_seconds >= 25 && curr_seconds <= 29){
+          sb.append("key=irDM2Efqq3SwNGNiCVGXdcufBlA8NTK9&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 34){
+          sb.append("key=NoDIrPttHg7aiTYqAWKv1tVGpSkvkjqu&");
+        }
+        if(curr_seconds >= 35 && curr_seconds <= 39){
+          sb.append("key=IEOPpZZNFanc8G1tHjgrJlaJVvj2ASOA&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 44){
+          sb.append("key=VT1GZvKhoDnNd9ArF7ld8Ylc5hw2swVD&");
+        }
+        if(curr_seconds >= 45 && curr_seconds <= 49){
+          sb.append("key=brInHtYH8bOQBKflutBpAETyRawD8esC&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 54){
+          sb.append("key=Wr6TTx3vkVBbOaY7rEG5RNSachCVpKmf&");
+        }
+        if(curr_seconds >= 55 && curr_seconds <= 59){
+          sb.append("key=GawyPGZhjKLHDlvSBTXALsCGxkmvDqyQ&");
+        }
+/*
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 39){
+          sb.append("key=ajC8yen0tsXlVZpTIZKhbiXE9GvkeAI4&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 49){
+          sb.append("key=gAi9J5PXky1e3SkIZO4G3jgrAeDVg0co&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 59){
+          sb.append("key=vtIXe4tZaElhYe9dQ3xLghTboscefItR&");
+        }
+        if(curr_seconds >= 0 && curr_seconds <= 9){
+          sb.append("key=IIWezVSCDaSsi9yttcPYjidgziugm3Dj&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 19){
+          sb.append("key=AYRg0NvTVGsLSIWgYjIHoR4akAqaevBP&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 29){
+          sb.append("key=irDM2Efqq3SwNGNiCVGXdcufBlA8NTK9&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 39){
+          sb.append("key=NoDIrPttHg7aiTYqAWKv1tVGpSkvkjqu&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 49){
+          sb.append("key=IEOPpZZNFanc8G1tHjgrJlaJVvj2ASOA&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 59){
+          sb.append("key=VT1GZvKhoDnNd9ArF7ld8Ylc5hw2swVD&");
+        }
+        if(curr_seconds >= 0 && curr_seconds <= 9){
+          sb.append("key=brInHtYH8bOQBKflutBpAETyRawD8esC&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 19){
+          sb.append("key=Wr6TTx3vkVBbOaY7rEG5RNSachCVpKmf&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 29){
+          sb.append("key=GawyPGZhjKLHDlvSBTXALsCGxkmvDqyQ&");
+*/
+/***/
+
+/*
+        if(curr_seconds >= 0 && curr_seconds <= 4){
+          sb.append("key=vkFZoVDOmKYZWzNzujhhkqKJ0Fh5gQm3&");
+        }
+        if(curr_seconds >= 5 && curr_seconds <= 9){
+          sb.append("key=5nGw2N8uZchiB2XLh11H2DgNKeBAlgWE&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 14){
+          sb.append("key=fwwhd736W7NOAL2OfuzE80uflmiONc4E&");
+        }
+        if(curr_seconds >= 15 && curr_seconds <= 19){
+          sb.append("key=pS1PQdW2RftWD87Od03zJ7XyT3RbRiya&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 24){
+          sb.append("key=5fT970Q9B6nLG6Gi3eE0HF9mR9POwsCt&");
+        }
+        if(curr_seconds >= 25 && curr_seconds <= 29){
+          sb.append("key=maGZx1JElHD6ATTcCGtbzFDoYMGA2LBx&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 34){
+          sb.append("key=Ilx0IW89xlXP4cV7dhAATFH8iAbNrT6K&");
+        }
+        if(curr_seconds >= 35 && curr_seconds <= 39){
+          sb.append("key=s2g7ZECvmHeWzawdZt8oxF4AM1Zva6tA&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 44){
+          sb.append("key=6ilahOPV5mUii3u8AEBwvIH5MJSzqpxa&");
+        }
+        if(curr_seconds >= 45 && curr_seconds <= 49){
+          sb.append("key=6dqs7L4mW2yzvF7A6RhoNolVdHRIEbYA&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 54){
+          sb.append("key=ZyGk2SYLFPRt31DH6B3khwZKgxpNSqyV&");
+        }
+        if(curr_seconds >= 55 && curr_seconds <= 59){
+          sb.append("key=3r7BMxeA3UHscUU6uTyDYUAmxA4x3q1j&");
+        }
+/*
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 39){
+          sb.append("key=vkFZoVDOmKYZWzNzujhhkqKJ0Fh5gQm3&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 49){
+          sb.append("key=5nGw2N8uZchiB2XLh11H2DgNKeBAlgWE&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 59){
+          sb.append("key=fwwhd736W7NOAL2OfuzE80uflmiONc4E&");
+        }
+        if(curr_seconds >= 0 && curr_seconds <= 9){
+          sb.append("key=pS1PQdW2RftWD87Od03zJ7XyT3RbRiya&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 19){
+          sb.append("key=5fT970Q9B6nLG6Gi3eE0HF9mR9POwsCt&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 29){
+          sb.append("key=maGZx1JElHD6ATTcCGtbzFDoYMGA2LBx&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 39){
+          sb.append("key=Ilx0IW89xlXP4cV7dhAATFH8iAbNrT6K&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 49){
+          sb.append("key=s2g7ZECvmHeWzawdZt8oxF4AM1Zva6tA&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 59){
+          sb.append("key=6ilahOPV5mUii3u8AEBwvIH5MJSzqpxa&");
+        }
+        if(curr_seconds >= 0 && curr_seconds <= 9){
+          sb.append("key=6dqs7L4mW2yzvF7A6RhoNolVdHRIEbYA&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 19){
+          sb.append("key=ZyGk2SYLFPRt31DH6B3khwZKgxpNSqyV&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 29){
+          sb.append("key=3r7BMxeA3UHscUU6uTyDYUAmxA4x3q1j&");
+        }
+*/
+
+
+/***/
+/*
+        if(curr_seconds >= 0 && curr_seconds <= 4){
+          sb.append("key=DurLK3zbgAFGOMAIB6Hx58eS8XTs8n1J&");
+        }
+        if(curr_seconds >= 5 && curr_seconds <= 9){
+          sb.append("key=f2gqfJfSpJAp4Z8Bs4miAGasgvjVdjki&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 14){
+          sb.append("key=pbdyecmAuGyQRyCew5KbOUuO7cOaElb3&");
+        }
+        if(curr_seconds >= 15 && curr_seconds <= 19){
+          sb.append("key=lpdkkC71Nxd9mokEoN2b6M0f2gGqZpTk&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 24){
+          sb.append("key=jasrFxeZiDXQeh2KuUpGzvIPLLzyHqFe&");
+        }
+        if(curr_seconds >= 25 && curr_seconds <= 29){
+          sb.append("key=BiooCboK2XbCEOwMpXiCNwCrUjZOsTko&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 34){
+          sb.append("key=iiFEzfQrjicJxAxaAAOA9SHM2AXI4CCX&");
+        }
+        if(curr_seconds >= 35 && curr_seconds <= 39){
+          sb.append("key=Aqak7f9sv09F40PNQ1peQ6KcvL3wOvcv&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 44){
+          sb.append("key=mkrEPHYRxAjqFLMpDXGDY5koVkc1sg4L&");
+        }
+        if(curr_seconds >= 45 && curr_seconds <= 49){
+          sb.append("key=l9vfOLGYYcNcwFtsSBvskDnWjcoxCZf&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 54){
+          sb.append("key=NVDx2tRK1NyaIIQhwAa5r8IcIi5FOOKA&");
+        }
+        if(curr_seconds >= 55 && curr_seconds <= 59){
+          sb.append("key=oEENAz0nk243t1U3nLiEaLNZfITyX5hf&");
+        }
+/*
+        if(curr_seconds >= 30 && curr_seconds <= 39){
+          sb.append("key=pbdyecmAuGyQRyCew5KbOUuO7cOaElb3&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 49){
+          sb.append("key=lpdkkC71Nxd9mokEoN2b6M0f2gGqZpTk&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 59){
+          sb.append("key=jasrFxeZiDXQeh2KuUpGzvIPLLzyHqFe&");
+        }
+        if(curr_seconds >= 0 && curr_seconds <= 9){
+          sb.append("key=BiooCboK2XbCEOwMpXiCNwCrUjZOsTko&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 19){
+          sb.append("key=iiFEzfQrjicJxAxaAAOA9SHM2AXI4CCX&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 29){
+          sb.append("key=Aqak7f9sv09F40PNQ1peQ6KcvL3wOvcv&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 39){
+          sb.append("key=mkrEPHYRxAjqFLMpDXGDY5koVkc1sg4L&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 49){
+          sb.append("key=l9vfOLGYYcNcwFtsSBvskDnWjcoxCZf&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 59){
+          sb.append("key=NVDx2tRK1NyaIIQhwAa5r8IcIi5FOOKA&");
+        }
+        if(curr_seconds >= 0 && curr_seconds <= 9){
+          sb.append("key=oEENAz0nk243t1U3nLiEaLNZfITyX5hf&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 19){
+          sb.append("key=f2gqfJfSpJAp4Z8Bs4miAGasgvjVdjki&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 29){
+          sb.append("key=DurLK3zbgAFGOMAIB6Hx58eS8XTs8n1J&");
+        }
+*/
+
+/***/
+/*
+        if(curr_seconds >= 0 && curr_seconds <= 4){
+          sb.append("key=AA8WBSWc0f6pO6Py8f49LsXSHPyFGw0Z&");
+        }
+        if(curr_seconds >= 5 && curr_seconds <= 9){
+          sb.append("key=2ciDNfV0npaVrmYgm0I0wwAoHDYDQ8PI&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 14){
+          sb.append("key=5syG4MEG4JGZpvyea6Gz6gfRy5Y1EnE8&");
+        }
+        if(curr_seconds >= 15 && curr_seconds <= 19){
+          sb.append("key=15klOG7JA1vUMtQikD4f9H3qYz1ZkmAe&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 24){
+          sb.append("key=aKwVNnaX6AgTr7WKPWV4fXk489TyYmjC&");
+        }
+        if(curr_seconds >= 25 && curr_seconds <= 29){
+          sb.append("key=qKS6MgDWVMxtiiGmYmj1tgxQUqOE003G&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 34){
+          sb.append("key=yAixf6B6NbubYFEnFIFTMLifix4XdwNf&");
+        }
+        if(curr_seconds >= 35 && curr_seconds <= 39){
+          sb.append("key=gT8DwjxgA2AKCYMI2o81iSnfNPXYjRzC&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 44){
+          sb.append("key=LppwXS5eJt8MXEPEgjht1VGYlavs1rzw&");
+        }
+        if(curr_seconds >= 45 && curr_seconds <= 49){
+          sb.append("key=qyOR0vvDfazJLhTIZDSslAJaTXnC4GO3&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 54){
+          sb.append("key=ALwAGLTUfoPEp8V243hLWc0vqTn10haJ&");
+        }
+        if(curr_seconds >= 55 && curr_seconds <= 59){
+          sb.append("key=WEgK8NKIyPPoIHlnbQqbqwbukdmAYlQV&");
+        }
+
+        if(curr_seconds >= 30 && curr_seconds <= 39){
+          sb.append("key=AA8WBSWc0f6pO6Py8f49LsXSHPyFGw0Z&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 49){
+          sb.append("key=2ciDNfV0npaVrmYgm0I0wwAoHDYDQ8PI&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 59){
+          sb.append("key=5syG4MEG4JGZpvyea6Gz6gfRy5Y1EnE8&");
+        }
+        if(curr_seconds >= 0 && curr_seconds <= 9){
+          sb.append("key=15klOG7JA1vUMtQikD4f9H3qYz1ZkmAe&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 19){
+          sb.append("key=aKwVNnaX6AgTr7WKPWV4fXk489TyYmjC&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 29){
+          sb.append("key=qKS6MgDWVMxtiiGmYmj1tgxQUqOE003G&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 39){
+          sb.append("key=yAixf6B6NbubYFEnFIFTMLifix4XdwNf&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 49){
+          sb.append("key=gT8DwjxgA2AKCYMI2o81iSnfNPXYjRzC&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 59){
+          sb.append("key=LppwXS5eJt8MXEPEgjht1VGYlavs1rzw&");
+        }
+        if(curr_seconds >= 0 && curr_seconds <= 9){
+          sb.append("key=qyOR0vvDfazJLhTIZDSslAJaTXnC4GO3&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 19){
+          sb.append("key=ALwAGLTUfoPEp8V243hLWc0vqTn10haJ&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 29){
+          sb.append("key=WEgK8NKIyPPoIHlnbQqbqwbukdmAYlQV&");
+        }
+*/
+
+
+/***/
+/*
+        if(curr_seconds >= 0 && curr_seconds <= 4){
+          sb.append("key=gKKPhXFpdsUnNEjT35a9T9SAZ5Rrw6KV&");
+        }
+        if(curr_seconds >= 5 && curr_seconds <= 9){
+          sb.append("key=YaNGVRrszE2RvPsbLOtSUiXUON2jlRG4&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 14){
+          sb.append("key=IqznAtsInMc4FGGNzIDyjrgGX62n8nY9&");
+        }
+        if(curr_seconds >= 15 && curr_seconds <= 19){
+          sb.append("key=pCKeB114NAUuch3Rd7lBj5d1Rs06gafz&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 24){
+          sb.append("key=NhDXklMUgFKuQPRqn0xVsyVngHbSi2hK&");
+        }
+        if(curr_seconds >= 25 && curr_seconds <= 29){
+          sb.append("key=g9dPfUNCEIHD7WqqqpTMZTMIFGQmv9vv&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 34){
+          sb.append("key=XYi94IXba4QT1IfTrO1qdckZ4707AGG5&");
+        }
+        if(curr_seconds >= 35 && curr_seconds <= 39){
+          sb.append("key=S6T6rkp597MgAI3EsLsTKlFoh4xzqPwf&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 44){
+          sb.append("key=7AbFD1VtFCs1eWU0SXDsS1xoBmQMGQwq&");
+        }
+        if(curr_seconds >= 45 && curr_seconds <= 49){
+          sb.append("key=VO59yPApZ69GSGGIXkIYTJBvhnFurji7&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 54){
+          sb.append("key=5c1050imPpL5G0JpraOxAuutisZBOPLt&");
+        }
+        if(curr_seconds >= 55 && curr_seconds <= 59){
+          sb.append("key=MZCWMnQ81S6bEoml7NTZOOYdRL6roGcQ&");
+        }
+
+        if(curr_seconds >= 30 && curr_seconds <= 39){
+          sb.append("key=gKKPhXFpdsUnNEjT35a9T9SAZ5Rrw6KV&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 49){
+          sb.append("key=YaNGVRrszE2RvPsbLOtSUiXUON2jlRG4&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 59){
+          sb.append("key=IqznAtsInMc4FGGNzIDyjrgGX62n8nY9&");
+        }
+        if(curr_seconds >= 0 && curr_seconds <= 4){
+          sb.append("key=pCKeB114NAUuch3Rd7lBj5d1Rs06gafz&");
+        }
+        if(curr_seconds >= 5 && curr_seconds <= 9){
+          sb.append("key=NhDXklMUgFKuQPRqn0xVsyVngHbSi2hK&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 14){
+          sb.append("key=g9dPfUNCEIHD7WqqqpTMZTMIFGQmv9vv&");
+        }
+        if(curr_seconds >= 15 && curr_seconds <= 19){
+          sb.append("key=XYi94IXba4QT1IfTrO1qdckZ4707AGG5&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 24){
+          sb.append("key=S6T6rkp597MgAI3EsLsTKlFoh4xzqPwf&");
+        }
+        if(curr_seconds >= 25 && curr_seconds <= 29){
+          sb.append("key=7AbFD1VtFCs1eWU0SXDsS1xoBmQMGQwq&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 34){
+          sb.append("key=VO59yPApZ69GSGGIXkIYTJBvhnFurji7&");
+        }
+        if(curr_seconds >= 35 && curr_seconds <= 39){
+          sb.append("key=5c1050imPpL5G0JpraOxAuutisZBOPLt&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 44){
+          sb.append("key=MZCWMnQ81S6bEoml7NTZOOYdRL6roGcQ&");
+        }
+
+*/
+/***/
+/*
+        if(curr_seconds >= 0 && curr_seconds <= 4){
+          sb.append("key=3Aa92jXOfGoAs95WmNdp6OBklKpksuYW&");
+        }
+        if(curr_seconds >= 5 && curr_seconds <= 9){
+          sb.append("key=JDYWtByPJ44uapQecNetiRxxKBTuvLuz&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 14){
+          sb.append("key=BFPiM8ElKRtvAAg3HTho9NITg4pEhIfk&");
+        }
+        if(curr_seconds >= 15 && curr_seconds <= 19){
+          sb.append("key=VNsfYOikhFtUbfm3iZUCZcp6aPNefRSJ&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 24){
+          sb.append("key=pdKW34g52FtHyPrbXMyD1TCX7mxHdbLy&");
+        }
+        if(curr_seconds >= 25 && curr_seconds <= 29){
+          sb.append("key=QCsvfLhpEph4kBgnw6LNkDafWjGPqq00&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 34){
+          sb.append("key=D7gEgHdMRksd292oguuFWVAAqajf7pWF&");
+        }
+        if(curr_seconds >= 35 && curr_seconds <= 39){
+          sb.append("key=utauaVBNP0I2Rpim7uQ3Lnc3VrDDVY47&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 44){
+          sb.append("key=0C4DolwwWjWaaV5i6spD4YwrRU7HWYgI&");
+        }
+        if(curr_seconds >= 45 && curr_seconds <= 49){
+          sb.append("key=ZPFP2QvE1QNbCwKyNFWDexO57K6OownN&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 54){
+          sb.append("key=5oKC3DGiMSxCOF94yXkryamjXtSUWln3&");
+        }
+        if(curr_seconds >= 55 && curr_seconds <= 59){
+          sb.append("key=ieLsisRJSIdIJcAPTqHyXGkgfZJW3D58&");
+        }
+
+        if(curr_seconds >= 45 && curr_seconds <= 49){
+          sb.append("key=3Aa92jXOfGoAs95WmNdp6OBklKpksuYW&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 54){
+          sb.append("key=JDYWtByPJ44uapQecNetiRxxKBTuvLuz&");
+        }
+        if(curr_seconds >= 55 && curr_seconds <= 59){
+          sb.append("key=BFPiM8ElKRtvAAg3HTho9NITg4pEhIfk&");
+        }
+        if(curr_seconds >= 0 && curr_seconds <= 9){
+          sb.append("key=VNsfYOikhFtUbfm3iZUCZcp6aPNefRSJ&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 19){
+          sb.append("key=pdKW34g52FtHyPrbXMyD1TCX7mxHdbLy&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 29){
+          sb.append("key=QCsvfLhpEph4kBgnw6LNkDafWjGPqq00&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 39){
+          sb.append("key=D7gEgHdMRksd292oguuFWVAAqajf7pWF&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 49){
+          sb.append("key=utauaVBNP0I2Rpim7uQ3Lnc3VrDDVY47&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 59){
+          sb.append("key=0C4DolwwWjWaaV5i6spD4YwrRU7HWYgI&");
+        }
+        if(curr_seconds >= 0 && curr_seconds <= 9){
+          sb.append("key=ZPFP2QvE1QNbCwKyNFWDexO57K6OownN&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 19){
+          sb.append("key=5oKC3DGiMSxCOF94yXkryamjXtSUWln3&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 29){
+          sb.append("key=ieLsisRJSIdIJcAPTqHyXGkgfZJW3D58&");
+        }
+*/
+/***/
+/*
+        if(curr_seconds >= 0 && curr_seconds <= 4){
+          sb.append("key=XauIrEyWgJcXzOf00oTv106mpjvfzXvG&");
+        }
+        if(curr_seconds >= 5 && curr_seconds <= 9){
+          sb.append("key=AHbTy9MGWRUAGDLE7I72QvquyMqxczmy&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 14){
+          sb.append("key=gRC4IwaZtvPKEYEf6CHxgcYEzwZP4vkB&");
+        }
+        if(curr_seconds >= 15 && curr_seconds <= 19){
+          sb.append("key=figEyXGPniZY4gwEZtHhS0sa90BUeX1g&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 24){
+          sb.append("key=TDvE9hNIjzgFIYtMToEw7W0K0xCIVAqg&");
+        }
+        if(curr_seconds >= 25 && curr_seconds <= 29){
+          sb.append("key=nXFbJqoYo0aDYQS6RXoKwgbMUZ8A79uF&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 34){
+          sb.append("key=YxpnAASohtjsfgdGPt7PVvLCexpFOx4H&");
+        }
+        if(curr_seconds >= 35 && curr_seconds <= 39){
+          sb.append("key=GBcEq3cC8N1CRrANIGiDYrj3AGsyeZQP&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 44){
+          sb.append("key=A5Ox7vUsGnG9cfJAqnPyj7okFTJDmd0Y&");
+        }
+        if(curr_seconds >= 45 && curr_seconds <= 49){
+          sb.append("key=xn3kvW640V9TZdMds3rZ8O9Mg5YEsCtM&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 54){
+          sb.append("key=ymehRe3g5hGhUp5FPDpzoBo3uZIngmQM&");
+        }
+        if(curr_seconds >= 55 && curr_seconds <= 59){
+          sb.append("key=jntQge923RiTeCSvEno5OH8P3A5Ren2P&");
+        }
+
+        if(curr_seconds >= 30 && curr_seconds <= 39){
+          sb.append("key=XauIrEyWgJcXzOf00oTv106mpjvfzXvG&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 49){
+          sb.append("key=AHbTy9MGWRUAGDLE7I72QvquyMqxczmy&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 59){
+          sb.append("key=gRC4IwaZtvPKEYEf6CHxgcYEzwZP4vkB&");
+        }
+        if(curr_seconds >= 0 && curr_seconds <= 9){
+          sb.append("key=figEyXGPniZY4gwEZtHhS0sa90BUeX1g&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 19){
+          sb.append("key=TDvE9hNIjzgFIYtMToEw7W0K0xCIVAqg&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 29){
+          sb.append("key=nXFbJqoYo0aDYQS6RXoKwgbMUZ8A79uF&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 39){
+          sb.append("key=YxpnAASohtjsfgdGPt7PVvLCexpFOx4H&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 49){
+          sb.append("key=GBcEq3cC8N1CRrANIGiDYrj3AGsyeZQP&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 59){
+          sb.append("key=A5Ox7vUsGnG9cfJAqnPyj7okFTJDmd0Y&");
+        }
+        if(curr_seconds >= 0 && curr_seconds <= 9){
+          sb.append("key=xn3kvW640V9TZdMds3rZ8O9Mg5YEsCtM&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 19){
+          sb.append("key=ymehRe3g5hGhUp5FPDpzoBo3uZIngmQM&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 29){
+          sb.append("key=jntQge923RiTeCSvEno5OH8P3A5Ren2P&");
+        }
+*/
+
+
+/***/
+/*
+        if(curr_seconds >= 0 && curr_seconds <= 4){
+          sb.append("key=9cLeam2QvWdA6SEOxT2tlZIH0JoBpBS9&");
+        }
+        if(curr_seconds >= 5 && curr_seconds <= 9){
+          sb.append("key=DcRcryztlR7xnPPcoyAnmZDCtg6mewKE&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 14){
+          sb.append("key=YWM83HI0n1talIL70xAvZVL7ppSFPt4h&");
+        }
+        if(curr_seconds >= 15 && curr_seconds <= 19){
+          sb.append("key=7NOAfRlrFTZJJZcOp7sv3vQNoLDNHa5o&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 24){
+          sb.append("key=IHoeyX7ACmgJ3wbsggxaPxrOg05vP2AO&");
+        }
+        if(curr_seconds >= 25 && curr_seconds <= 29){
+          sb.append("key=owXl8WKZWtdFii8ZOp36HXsvIucjk4Or&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 34){
+          sb.append("key=2OGkH0qN90sXixyfmliPbbq6qKZ2MWQ7&");
+        }
+        if(curr_seconds >= 35 && curr_seconds <= 39){
+          sb.append("key=dlL54NUfpeeutgrNPNUIMWAYKArAxCna&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 44){
+          sb.append("key=4eySDVz83GA36GsX16A1LAJd1hgnkdaA&");
+        }
+        if(curr_seconds >= 45 && curr_seconds <= 49){
+          sb.append("key=ooXGFva4DpFrLgr1APcH1s4UmlMh9S4R&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 54){
+          sb.append("key=FTAYmD5XQUGyfVDcs4wzJJOylzqDutQ0&");
+        }
+        if(curr_seconds >= 55 && curr_seconds <= 59){
+          sb.append("key=hTOWEdJgwZyVvPSbhRm53ZpEnRItsSH2&");
+        }
+
+        if(curr_seconds >= 30 && curr_seconds <= 39){
+          sb.append("key=9cLeam2QvWdA6SEOxT2tlZIH0JoBpBS9&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 49){
+          sb.append("key=DcRcryztlR7xnPPcoyAnmZDCtg6mewKE&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 59){
+          sb.append("key=YWM83HI0n1talIL70xAvZVL7ppSFPt4h&");
+        }
+        if(curr_seconds >= 0 && curr_seconds <= 9){
+          sb.append("key=7NOAfRlrFTZJJZcOp7sv3vQNoLDNHa5o&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 19){
+          sb.append("key=IHoeyX7ACmgJ3wbsggxaPxrOg05vP2AO&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 29){
+          sb.append("key=owXl8WKZWtdFii8ZOp36HXsvIucjk4Or&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 39){
+          sb.append("key=2OGkH0qN90sXixyfmliPbbq6qKZ2MWQ7&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 49){
+          sb.append("key=dlL54NUfpeeutgrNPNUIMWAYKArAxCna&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 59){
+          sb.append("key=4eySDVz83GA36GsX16A1LAJd1hgnkdaA&");
+        }
+        if(curr_seconds >= 0 && curr_seconds <= 9){
+          sb.append("key=ooXGFva4DpFrLgr1APcH1s4UmlMh9S4R&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 19){
+          sb.append("key=FTAYmD5XQUGyfVDcs4wzJJOylzqDutQ0&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 29){
+          sb.append("key=hTOWEdJgwZyVvPSbhRm53ZpEnRItsSH2&");
+        }
+*/
+
+
+
+/***/
+/*
+        if(curr_seconds >= 0 && curr_seconds <= 4){
+          sb.append("key=3d5SkxklHSjIzhwIFvAfKeBQDDFMoBRX&");
+        }
+        if(curr_seconds >= 5 && curr_seconds <= 9){
+          sb.append("key=7KWujZwzZDeWsmWi4EsI8hhhtgtkJnDQ&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 14){
+          sb.append("key=YAFWxG8kYJ2xh4HDiikrDMXp4XCekt1N&");
+        }
+        if(curr_seconds >= 15 && curr_seconds <= 19){
+          sb.append("key=tfZPXptWfppa7Rk6pLol1cDAxpCEw7hb&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 24){
+          sb.append("key=3GYUhKym3K3KYj760fqzpojW73itqfV4&");
+        }
+        if(curr_seconds >= 25 && curr_seconds <= 29){
+          sb.append("key=3XJo35tL0NjNvAP6vt3j9MkFbClS6aDc&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 34){
+          sb.append("key=jlwzyMydqo7MolHLtjYJDfGQmuzjTxjJ&");
+        }
+        if(curr_seconds >= 35 && curr_seconds <= 39){
+          sb.append("key=aKbj7zEYhf99ps10USSChjVDcgQh3n1x&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 44){
+          sb.append("key=D7SlRGBbcAuxxDdD1BRu0drtetxhTxiT&");
+        }
+        if(curr_seconds >= 45 && curr_seconds <= 49){
+          sb.append("key=WG5EAruv3M3FDeLaEii6sHsoGaxWbZZ4&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 54){
+          sb.append("key=eErsYEHN1qmGS8dRPM2fLyPWm0Zm7S8s&");
+        }
+        if(curr_seconds >= 55 && curr_seconds <= 59){
+          sb.append("key=GWt0Vsj6bn8HEN05xQ6VGr9QAlZtqyTg&");
+        }
+
+        if(curr_seconds >= 30 && curr_seconds <= 39){
+          sb.append("key=3d5SkxklHSjIzhwIFvAfKeBQDDFMoBRX&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 49){
+          sb.append("key=7KWujZwzZDeWsmWi4EsI8hhhtgtkJnDQ&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 59){
+          sb.append("key=YAFWxG8kYJ2xh4HDiikrDMXp4XCekt1N&");
+        }
+        if(curr_seconds >= 0 && curr_seconds <= 9){
+          sb.append("key=tfZPXptWfppa7Rk6pLol1cDAxpCEw7hb&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 19){
+          sb.append("key=3GYUhKym3K3KYj760fqzpojW73itqfV4&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 29){
+          sb.append("key=3XJo35tL0NjNvAP6vt3j9MkFbClS6aDc&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 39){
+          sb.append("key=jlwzyMydqo7MolHLtjYJDfGQmuzjTxjJ&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 49){
+          sb.append("key=aKbj7zEYhf99ps10USSChjVDcgQh3n1x&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 59){
+          sb.append("key=D7SlRGBbcAuxxDdD1BRu0drtetxhTxiT&");
+        }
+        if(curr_seconds >= 0 && curr_seconds <= 9){
+          sb.append("key=WG5EAruv3M3FDeLaEii6sHsoGaxWbZZ4&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 19){
+          sb.append("key=eErsYEHN1qmGS8dRPM2fLyPWm0Zm7S8s&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 29){
+          sb.append("key=GWt0Vsj6bn8HEN05xQ6VGr9QAlZtqyTg&");
+        }
+*/
+/***/
+/*
+        if(curr_seconds >= 0 && curr_seconds <= 4){
+          sb.append("key=AhIcmd13qfC8CqQv1NyoqbDR7ONqvwk9&");
+        }
+        if(curr_seconds >= 5 && curr_seconds <= 9){
+          sb.append("key=wJmasI5Fr4wHkHp6BFNWKqQBUDDXFNGA&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 14){
+          sb.append("key=nZGp8EA4aZItwcOVkDmy8x5YAexBxxVZ&");
+        }
+        if(curr_seconds >= 15 && curr_seconds <= 19){
+          sb.append("key=jkDPDwRoxyzcIrHMSLFzGBcS1oR2GwpU&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 24){
+          sb.append("key=lNe0t3g3oXpj0LOebnAF9FMz0IY01Pez&");
+        }
+        if(curr_seconds >= 25 && curr_seconds <= 29){
+          sb.append("key=npUHpWeGtCqP61kqC1TZ1i4GATrNiACm&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 34){
+          sb.append("key=Y8KcgfxK49jOoQPY45XYTgVCDVuxeIpV&");
+        }
+        if(curr_seconds >= 35 && curr_seconds <= 39){
+          sb.append("key=tQ6bJiWEu1rjektUGsKdlHHxG5cg0dPv&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 44){
+          sb.append("key=ef4FvmOQuTUaWN1vPclZ4oTkKFENqyN4&");
+        }
+        if(curr_seconds >= 45 && curr_seconds <= 49){
+          sb.append("key=gy1A2DRyeeLDMAGFY1lIHiPcAxg3kbRT&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 54){
+          sb.append("key=NfkOQPxJ2mEWcZFeEJdPkyyPwxG17LhF&");
+        }
+        if(curr_seconds >= 55 && curr_seconds <= 59){
+          sb.append("key=WjYJw8QGZOYYdATeq1hZvUBYv515HPLA&");
+        }
+
+        if(curr_seconds >= 30 && curr_seconds <= 39){
+          sb.append("key=AhIcmd13qfC8CqQv1NyoqbDR7ONqvwk9&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 49){
+          sb.append("key=wJmasI5Fr4wHkHp6BFNWKqQBUDDXFNGA&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 59){
+          sb.append("key=nZGp8EA4aZItwcOVkDmy8x5YAexBxxVZ&");
+        }
+        if(curr_seconds >= 0 && curr_seconds <= 9){
+          sb.append("key=jkDPDwRoxyzcIrHMSLFzGBcS1oR2GwpU&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 19){
+          sb.append("key=lNe0t3g3oXpj0LOebnAF9FMz0IY01Pez&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 29){
+          sb.append("key=npUHpWeGtCqP61kqC1TZ1i4GATrNiACm&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 39){
+          sb.append("key=Y8KcgfxK49jOoQPY45XYTgVCDVuxeIpV&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 49){
+          sb.append("key=tQ6bJiWEu1rjektUGsKdlHHxG5cg0dPv&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 59){
+          sb.append("key=ef4FvmOQuTUaWN1vPclZ4oTkKFENqyN4&");
+        }
+        if(curr_seconds >= 0 && curr_seconds <= 9){
+          sb.append("key=gy1A2DRyeeLDMAGFY1lIHiPcAxg3kbRT&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 19){
+          sb.append("key=NfkOQPxJ2mEWcZFeEJdPkyyPwxG17LhF&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 29){
+          sb.append("key=WjYJw8QGZOYYdATeq1hZvUBYv515HPLA&");
+        }
+
+/**/
+/*
+        if(curr_seconds >= 0 && curr_seconds <= 4){
+          sb.append("key=AxZGUyg6PcidAfRKBhfzz11J6aVmDgQn&");
+        }
+        if(curr_seconds >= 5 && curr_seconds <= 9){
+          sb.append("key=nuxyiWRTbGPdETSVyISUqDWZxcBv5vY8&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 14){
+          sb.append("key=nZ1grjxzUwIWiHm3OM7G9wpaaOvmwPRC&");
+        }
+        if(curr_seconds >= 15 && curr_seconds <= 19){
+          sb.append("key=ZWZlRahZSKNlk6nqkr1mGoJFRqXbi6gL&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 24){
+          sb.append("key=4IZLjC1xpDubyT8nTRAtI4K6N2oFd6PO&");
+        }
+        if(curr_seconds >= 25 && curr_seconds <= 29){
+          sb.append("key=w5AYLcPYdSPzcu4uNrgdbhRURw8YTskP&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 34){
+          sb.append("key=86AuTKLq5veuCA0bFSnhXP2ZupcjPTPl&");
+        }
+        if(curr_seconds >= 35 && curr_seconds <= 39){
+          sb.append("key=TdEDVMdhhXPO36yuEYaymLHGM9Z2b1Wf&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 44){
+          sb.append("key=fWxEdFscKezGE9OS4ttzL5IrJGHaeZSr&");
+        }
+        if(curr_seconds >= 45 && curr_seconds <= 49){
+          sb.append("key=rMBrGYc79khyhLVcO1ilhVaeUF2zKLmZ&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 54){
+          sb.append("key=pggGmlvqUuL8htYmkWWdddGPrYTp3UTS&");
+        }
+        if(curr_seconds >= 55 && curr_seconds <= 59){
+          sb.append("key=DIacwHLYLCUsGghAERwkfApBcMADzqap&");
+        }
+
+        if(curr_seconds >= 30 && curr_seconds <= 39){
+          sb.append("key=AxZGUyg6PcidAfRKBhfzz11J6aVmDgQn&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 49){
+          sb.append("key=nuxyiWRTbGPdETSVyISUqDWZxcBv5vY8&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 59){
+          sb.append("key=nZ1grjxzUwIWiHm3OM7G9wpaaOvmwPRC&");
+        }
+        if(curr_seconds >= 0 && curr_seconds <= 9){
+          sb.append("key=ZWZlRahZSKNlk6nqkr1mGoJFRqXbi6gL&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 19){
+          sb.append("key=4IZLjC1xpDubyT8nTRAtI4K6N2oFd6PO&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 29){
+          sb.append("key=w5AYLcPYdSPzcu4uNrgdbhRURw8YTskP&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 39){
+          sb.append("key=86AuTKLq5veuCA0bFSnhXP2ZupcjPTPl&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 49){
+          sb.append("key=TdEDVMdhhXPO36yuEYaymLHGM9Z2b1Wf&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 59){
+          sb.append("key=fWxEdFscKezGE9OS4ttzL5IrJGHaeZSr&");
+        }
+        if(curr_seconds >= 0 && curr_seconds <= 9){
+          sb.append("key=rMBrGYc79khyhLVcO1ilhVaeUF2zKLmZ&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 19){
+          sb.append("key=pggGmlvqUuL8htYmkWWdddGPrYTp3UTS&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 29){
+          sb.append("key=DIacwHLYLCUsGghAERwkfApBcMADzqap&");
+        }
+
+
+
+/***/
+
+        if(curr_seconds >= 0 && curr_seconds <= 4){
+          sb.append("key=LIjUEssRnNTrMDvkDw9qEzZzObYIiet8&");
+        }
+        if(curr_seconds >= 5 && curr_seconds <= 9){
+          sb.append("key=irThcIiAITP3mj65XS1XRY9mmxrtyeQI&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 14){
+          sb.append("key=Slc68xzN8HXk66hE8qiUjm72YySxcxct&");
+        }
+        if(curr_seconds >= 15 && curr_seconds <= 19){
+          sb.append("key=nXMbuWJL3i6vtBO9MC21BRMQFiNGxiol&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 24){
+          sb.append("key=xBA1HyHY7rEqZGNPHP3lfKe1g6xAAjoK&");
+        }
+        if(curr_seconds >= 25 && curr_seconds <= 29){
+          sb.append("key=cuA7Nwn3ZxZHIAWLhlMrXCrAUQhJuHmf&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 34){
+          sb.append("key=YgAg8IWhB9kATuDsH0LpEbWIu02GZS66&");
+        }
+        if(curr_seconds >= 35 && curr_seconds <= 39){
+          sb.append("key=ubOA7gAfdhzGgAxrGCMJ3NKr6MbTPTNL&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 44){
+          sb.append("key=iQJGaAuJDv5Mo5H9POKKFLxDUkmkI0wN&");
+        }
+        if(curr_seconds >= 45 && curr_seconds <= 49){
+          sb.append("key=FRHP7hWc3ETAsQvDpZPr0vea3uXbDZhY&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 54){
+          sb.append("key=NTh31KcVA1AGzXs10jqAUqWBpGleAiWf&");
+        }
+        if(curr_seconds >= 55 && curr_seconds <= 59){
+          sb.append("key=9NiU24lnAI4XrfliEjSZcwRFAUZPBVW9&");
+        }
+/*
+        if(curr_seconds >= 30 && curr_seconds <= 39){
+          sb.append("key=LIjUEssRnNTrMDvkDw9qEzZzObYIiet8&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 49){
+          sb.append("key=irThcIiAITP3mj65XS1XRY9mmxrtyeQI&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 59){
+          sb.append("key=Slc68xzN8HXk66hE8qiUjm72YySxcxct&");
+        }
+        if(curr_seconds >= 0 && curr_seconds <= 9){
+          sb.append("key=nXMbuWJL3i6vtBO9MC21BRMQFiNGxiol&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 19){
+          sb.append("key=xBA1HyHY7rEqZGNPHP3lfKe1g6xAAjoK&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 29){
+          sb.append("key=cuA7Nwn3ZxZHIAWLhlMrXCrAUQhJuHmf&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 39){
+          sb.append("key=YgAg8IWhB9kATuDsH0LpEbWIu02GZS66&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 49){
+          sb.append("key=ubOA7gAfdhzGgAxrGCMJ3NKr6MbTPTNL&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 59){
+          sb.append("key=iQJGaAuJDv5Mo5H9POKKFLxDUkmkI0wN&");
+        }
+        if(curr_seconds >= 0 && curr_seconds <= 9){
+          sb.append("key=FRHP7hWc3ETAsQvDpZPr0vea3uXbDZhY&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 19){
+          sb.append("key=NTh31KcVA1AGzXs10jqAUqWBpGleAiWf&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 29){
+          sb.append("key=9NiU24lnAI4XrfliEjSZcwRFAUZPBVW9&");
+        }
+
+
+/***/
+/*
+        if(curr_seconds >= 30 && curr_seconds <= 39){
+          sb.append("key=8Zgql9nqqbWXqb78tdiQFaP2mEHhuoyl&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 49){
+          sb.append("key=WSS7wBoYF2EEUvqyE5KHe4UK3PJ8DR0s&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 59){
+          sb.append("key=rROxwsaYLYn5f8r89vMc7eUye35goKws&");
+        }
+*/
+/*
+        if(curr_seconds >= 0 && curr_seconds <= 9){
+          sb.append("key=RISlKwY5YnScAf51kcwzNwyu7shL9iKp&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 19){
+          sb.append("key=bGORyk80RWBsAr7ZzuDSoKbmd3xhPgkG&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 29){
+          sb.append("key=Pq2YnjPSAl7GLAWdsMMfdrUaoTQwsCqm&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 39){
+          sb.append("key=xYFucUfpGfSYM33XhdQhnjELSbP41Wjr&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 49){
+          sb.append("key=yyKDgOQ1EY6PRBpoDjVxN7rXlXsqF8pU&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 59){
+          sb.append("key=xxOyqVJrfzWAmdCJI2GbyKjIALw9ndcv&");
+        }
+*/
+/*
+        if(curr_seconds >= 0 && curr_seconds <= 9){
+          sb.append("key=GB1D0jS3FvNK4TNq7JMuiI873ATnNNLv&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 19){
+          sb.append("key=mlfteqYr3nOom84YlRp9GOysQtGFAMZi&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 29){
+          sb.append("key=14gOyVUW2u7RUFoY7HAQj5quvt6KrpOW&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 39){
+          sb.append("key=d5xquOlMx3w3XGyNIgoXi8mS2GZFUIjT&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 49){
+          sb.append("key=p7yA6pcNr0yHjXG1b7PIXkkMUOvrX2Bm&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 59){
+          sb.append("key=KmJ9eWVbY8a1FI9JyxdI4O4fEJxwDI0c&");
+        }
+*/
+/*
+        if(curr_seconds >= 0 && curr_seconds <= 9){
+          sb.append("key=jjj0fnRfsEhh9n0Y3zjCu32d0fnGZ6IQ&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 19){
+          sb.append("key=sQKZcJkxyfZGRw3nZ37iLO632GQXevZO&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 29){
+          sb.append("key=azzuEuoRvKP7JfgRIzoh7ZGxZuXcjkNE&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 39){
+          sb.append("key=dUk3fRhovGjqDZqdNpZfY0EoHgCiMiua&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 49){
+          sb.append("key=RFINa1maYekdvuJY7QdbJ5ZtRsCRjo7C&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 59){
+          sb.append("key=KsyDcmIjpH1zASZdFYmLHOqTVk2uDmty&");
+        }
+*/
+/*
+        if(curr_seconds >= 0 && curr_seconds <= 9){
+          sb.append("key=Pql8fYP7jIu2LXLTg6ZtI1O4jQAT4PPu&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 19){
+          sb.append("key=QD6Dj7AqQhQprhsvZqFBkKKJIrjOqSBe&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 29){
+          sb.append("key=klew6U2vAGHuGIoRS0929IhKdvxZo945&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 39){
+          sb.append("key=NKoKtllmEc9ZM0XsNvxvyoGTGcqUkZyu&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 49){
+          sb.append("key=P5f2B8SsMv2Y7KZkfTFW3V30F80Ctijj&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 59){
+          sb.append("key=xOyAA9pnR3p4KDoCM76tlRs7K6v9fHVO&");
+        }
+*/
+/*
+        if(curr_seconds >= 0 && curr_seconds <= 9){
+          sb.append("key=vovQhcCr41EvtaNUIC3u3d8FZlGKIayg&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 19){
+          sb.append("key=DFhWpM8v38Ak3etBnzLnEzqXT5WMqe4M&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 29){
+          sb.append("key=moAMnpaGNIZ7xOdDRGaP0CQQddEGtiD0&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 39){
+          sb.append("key=6CQOE2S9JAS2f8IsUwypMNF3QvsAgWAK&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 49){
+          sb.append("key=NCm21GhGCl3RUfwjWtWAlzqSqLbGSfQr&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 59){
+          sb.append("key=yV1XuKncZUebcoGxgjDU6jlO5pk5meWG&");
+        }
+*/
+/*
+        if(curr_seconds >= 0 && curr_seconds <= 9){
+          sb.append("key=XpKmAkICHweXNeyVevA1qFKOypWWLvva&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 19){
+          sb.append("key=0yqdaLv5PpMBBL9fluXPRFcP6knWABNK&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 29){
+          sb.append("key=LZAgA9Lfgys4xB1d32q9AgNgARbhXFEl&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 39){
+          sb.append("key=jdGdzJUyLHgb8W28lOZI9O3gby6DgF5D&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 49){
+          sb.append("key=1ZhS74qJTGZTEyZRh4sdRQ5HQPA5dGSn&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 59){
+          sb.append("key=7oJskYYIcwtdHG1e2R0AyAmQNRJQesTx&");
+        }
+/*
+        if(curr_seconds >= 0 && curr_seconds <= 9){
+          sb.append("key=XzSpBcA0HLwbO1SOBQJumGG3ozxvdjBr&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 19){
+          sb.append("key=dAYjAeHGmz4GN3AwSjZZm08kUVCflMIy&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 29){
+          sb.append("key=xnVKjhkkJQCnuKpnLYrmAYJN5gHy3nTK&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 39){
+          sb.append("key=SfUwRoH3uGKrL8MUd4AJ8muELQ5N19uA&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 49){
+          sb.append("key=ssLH37rcGmMuXt421Z4ecbzRRUtDv2zg&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 59){
+          sb.append("key=NLriXVlF1ibRQeCIWH4SxoAKOAfuYL5D&");
+        }
+*/
+/*
+        if(curr_seconds >= 0 && curr_seconds <= 9){
+          sb.append("key=BkRG2ByEZkTzAFOsCrMGb9XMQigAShnk&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 19){
+          sb.append("key=2Q7SYRiUlwrNP3SPRbXwcbCGznC7wxlq&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 29){
+          sb.append("key=HFQn6GAulnSoZBkiNo2At9Q2LiRsiVV4&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 39){
+          sb.append("key=OCsYQBAiP30lQGiYIOwegxD7bee9sk6K&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 49){
+          sb.append("key=V8KTYNlK4tZ0RNh0aVmIh081lAJErroU&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 59){
+          sb.append("key=nr5keLqACltGYLT3ADzVgy5r4xNj7f0a&");
+        }
+*/
+/*
+        if(curr_seconds >= 0 && curr_seconds <= 9){
+          sb.append("key=QCQExGyuGAO8Bkkq2z64vfGCStyEJcFi&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 19){
+          sb.append("key=AVf9q36EWfKzyFpGG4qJRypH7XrfHKsT&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 29){
+          sb.append("key=ALDgbwWCgiGV5vIjnpQpwUx3sN33eLwY&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 39){
+          sb.append("key=kyPcnjIoU68qpeCVaRkwCGKpd1ByoGYa&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 49){
+          sb.append("key=Ebu3TCeJ0mHdE6KFRjRoPwgtCHUn18M1&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 59){
+          sb.append("key=XyHcvDbJcNr9XjEo5LVDo6Uoj6ArHz7K&");
+        }
+*/
+/*
+        if(curr_seconds >= 0 && curr_seconds <= 9){
+          sb.append("key=q35QHAAEa5WrGa3HivqGTqotQvckaEZZ&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 19){
+          sb.append("key=lCcNVL3umHNGsigkNlhSXvYGwkb80pMT&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 29){
+          sb.append("key=GkhpbDdqyMpbRIywQmbkXWmEEgLvMB2q&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 39){
+          sb.append("key=fg3HcoNWgSgHpBWNGt0zp16Ny92kBZxq&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 49){
+          sb.append("key=vW6V0ttCqC7d0Dxt1oDkHeOombmKKbF8&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 59){
+          sb.append("key=O43cWMvLY2wgUmnEByyq7vP5gDY9mLKh&");
+        }
+*/
+/*
+        if(curr_seconds >= 0 && curr_seconds <= 9){
+          sb.append("key=fAyG9lxT01XwBeCtMT6aXCotW4uxnQLA&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 19){
+          sb.append("key=NX7WrmrbivZTf9OQyqVshs30p7VhdJwZ&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 29){
+          sb.append("key=O4ZYtky32QfYYHJKB2WHnF62yqWBHep7&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 39){
+          sb.append("key=tlLBogjkyeb9uZhXk30vIX3j26gPXIQG&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 49){
+          sb.append("key=cKUGriqcMA58Yr6ILyWcrjqAjEJoYIAV&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 59){
+          sb.append("key=VKkR0sCVEnXDCoA85yr4HMjptO4xJPMe&");
+        }
+*/
+/*
+        if(curr_seconds >= 0 && curr_seconds <= 9){
+          sb.append("key=FEG3jsqNhOanxOdahQaRvBeS0ELxnQr3&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 19){
+          sb.append("key=TD1x9kS7heXIXV9o3xkHhpznkaGEZNBE&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 29){
+          sb.append("key=1l04KlwILtlYw218pafenWHzIFDtFIat&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 39){
+          sb.append("key=b2rmArG8ix1R2leR783CGjAIbfZm5oad&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 49){
+          sb.append("key=NGFHPpjIjU7a4G2VlU5BMvDAgPOy7E1X&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 59){
+          sb.append("key=GRtIGyn8SjCGY35OcTsHAzeY0TH9GSnd&");
+        }
+*/
+/*
+        if(curr_seconds >= 0 && curr_seconds <= 9){
+          sb.append("key=WcUEx13JwC4RXkFM342d75TmAtVO7AOb&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 19){
+          sb.append("key=ce0rPmRfUASGlpXRJ31CJqaTkeCGgTmd&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 29){
+          sb.append("key=7xLEozMBAj9Gm4o41M4GDkzA5iDpoBXE&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 39){
+          sb.append("key=uIwL9mgRgPVcmVrgs8AkmDGEsQ2AiAZb&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 49){
+          sb.append("key=GoUEd1ofGYzBt8tDFu3bKMWsIiPhK4Ab&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 59){
+          sb.append("key=9TDgPDQxgSqWLXZ79leNW9Gk6qH1XqLe&");
+        }
+*/
+/*
+        if(curr_seconds >= 0 && curr_seconds <= 9){
+          sb.append("key=q38kyAhuoK2DFtwhWCRGGjqu6zRYPkJy&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 19){
+          sb.append("key=g3ddeZy1gnh0JDEgPgT6VoGUyDbXfbJx&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 29){
+          sb.append("key=hdLRQSqIEVr1KQzAnu2rjhCtszXOk9eo&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 39){
+          sb.append("key=miTQhQFm7DuVkHFRpbqKiye33nSeK11o&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 49){
+          sb.append("key=fS7UIMkWHtS8obXRcAYZEps1utiwdeYw&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 59){
+          sb.append("key=aidK1iPCgGD5M11LnrTx9H8IIuYKZZoy&");
+        }
+*/
+/*
+        if(curr_seconds >= 0 && curr_seconds <= 9){
+          sb.append("key=hJ7YWdQrXBMybfvAGTkURoGh548P1n3Y&");
+        }
+        if(curr_seconds >= 10 && curr_seconds <= 19){
+          sb.append("key=ot1gzAaV2vAerMKQ847G9rD9f9nYFDbZ&");
+        }
+        if(curr_seconds >= 20 && curr_seconds <= 29){
+          sb.append("key=WU7iQg77oYni3iYK1HcAepYXjrHJPehW&");
+        }
+        if(curr_seconds >= 30 && curr_seconds <= 39){
+          sb.append("key=G4qfgH2gIAUCDM0AVAAA9DelpnDvtTUL&");
+        }
+        if(curr_seconds >= 40 && curr_seconds <= 49){
+          sb.append("key=9rZvuZPdY36erPtpytkUKNPex0EYLKEA&");
+        }
+        if(curr_seconds >= 50 && curr_seconds <= 59){
+          sb.append("key=9y5zb2AvWaNxJ32m6cdMxVXXu5SubZcW&");
+        }
+*/
+        //sb.append("osm_type=W&");
+        sb.append("addressdetails=").append(rtp.getString(PROP_addressdetails,"1")).append("&"); // 0,1
+//        sbf.append("addressdetails=").append(rtp.getString(PROP_addressdetails,"1")).append("&"); // 0,1
+        sb.append("zoom=").append(rtp.getString(PROP_zoom,"18")).append("&"); // 0..18
+//        sbf.append("zoom=").append(rtp.getString(PROP_zoom,"18")).append("&"); // 0..18
+        sb.append("email=").append(this.getEmail()).append("&"); // required, per usage policy
+        sb.append("lat=").append(gp.getLatitudeString( GeoPoint.SFORMAT_DEC_5,null)).append("&");
+//        sbf.append("lat=").append(gp.getLatitudeString( GeoPoint.SFORMAT_DEC_5,null)).append("&");
+        sb.append("lon=").append(gp.getLongitudeString(GeoPoint.SFORMAT_DEC_5,null));
+//        sbf.append("lon=").append(gp.getLongitudeString(GeoPoint.SFORMAT_DEC_5,null));
+        return sb.toString();
+//        return sbf.toString();
+    }
+
+    private Document GetXMLDocument(String url) 
+    {
+         try {
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            InputStream input = HTMLTools.inputStream_GET(url, 5000);
+            InputStreamReader reader = new InputStreamReader(input, ENCODING_UTF8);
+            InputSource inSrc = new InputSource(reader);
+            inSrc.setEncoding(ENCODING_UTF8);
+            return db.parse(inSrc);
+        } catch (ParserConfigurationException pce) {
+            Print.logError("Parse error: " + pce);
+            return null;
+        } catch (SAXException se) {
+            Print.logError("Parse error: " + se);
+            return null;
+        } catch (IOException ioe) {
+            Print.logError("IO error: " + ioe);
+            return null;
+        }
+    }
+
+    // ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
+
+    /**
+    *** Main entery point for debugging/testing
+    **/
+    public static void main(String argv[])
+    {
+        RTConfig.setCommandLineArgs(argv);
+        Print.setAllOutputToStdout(true);
+        Print.setEncoding(ENCODING_UTF8);
+
+        /* host */
+        String host = RTConfig.getString("host",null);
+        if (!StringTools.isBlank(host)) {
+            HOST_PRIMARY = host;
+        }
+
+        /* GeoPoint */
+        GeoPoint gp = new GeoPoint(RTConfig.getString("gp",null));
+        if (!gp.isValid()) {
+            Print.logInfo("Invalid GeoPoint specified");
+            System.exit(1);
+        }
+        Print.logInfo("Reverse-Geocoding GeoPoint: " + gp);
+
+        /* Reverse Geocoding */
+        Nominatim gn = new Nominatim("nominatim", null, RTConfig.getCommandLineProperties());
+        Print.sysPrintln("RevGeocode = " + gn.getReverseGeocode(gp,null/*localeStr*/,false/*cache*/));
+
+    }
+
+}

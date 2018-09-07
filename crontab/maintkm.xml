@@ -1,0 +1,37 @@
+<!-- 
+ === Periodic Maintenance check
+ ===
+ === Example entry in 'bin/serverList':
+ ===   execServer  "Cron Scheduler"  "cron"  "${option}" "-crontab=${GTS_HOME}/crontab/maintkm.xml" 
+ ===
+ === Example Rule entry:
+ ===   name: maintkm
+ ===   rule: ($MAINTKM)
+ ===   subj: Periodic service is due for "${device}"
+ ===   body: =====================================================
+ ===         Account   : ${account} [${accountid}]
+ ===         Device    : ${device} [${deviceid}]
+ ===         Date/Time : ${datetime}
+ ===         Location  : ${geopoint}  [${latitude}/${longitude}]
+ ===         Address   : ${address}
+ ===         Odometer  : ${odometer}
+ ===         =====================================================
+ -->
+<Crontab 
+    timeZone="Canada/Eastern"   
+    interval="60"           
+    autoReload="false"      
+    threadPoolSize="1"      
+    >
+
+    <!-- Example executing "RuleCron -account=ALL -device=ALL -rule=maintkm" at midnight -->
+    <Job name="PeriodicMaintenance" active="true">
+        <Class>org.opengts.rule.RuleCron</Class>
+        <Method>cron</Method>
+        <Arg>-account=ALL</Arg>
+        <Arg>-device=ALL</Arg>
+        <Arg>-rule=maintkm</Arg>
+        <When hour="01" minute="00"/>
+    </Job>
+
+</Crontab>

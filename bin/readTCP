@@ -1,0 +1,37 @@
+#!/usr/bin/perl
+# -----------------------------------------------------------------------------
+# read data from specified UDP port
+# Usage:  readTCP -port <port>
+# -----------------------------------------------------------------------------
+
+# --- options
+use Getopt::Long;
+%argctl = ("port=i" => \$opt_port);
+if (!&GetOptions(%argctl) || !$opt_port || ($opt_port <= 0)) {
+    print "Usage: $0 [-help] -port <port>\n";
+    print "  -p[ort] <port>  Log port number\n";
+    print "  -h[elp]         Print this help (usage)\n";
+    exit(1);
+}
+
+# --- open client
+use IO::Socket;
+$logSock = IO::Socket::INET->new(
+    LocalAddr=>'localhost', LocalPort=>$opt_port, Proto=>"tcp", Listen=>1, Reuse=>1);
+if (!$logSock) { die "<tcp socket open failed> $!\n"; }
+
+# --- read forever
+$| = 1; # - autoflush
+while (1) {
+    my $msg;
+    my $client = $logSock->accept();
+    my $fromAddr = $client->recv($msg, 400, 0);
+    print "$msg\n";
+    $client->send("recv: $msg\r\n\r\n", 0);
+    sleep(1);
+    $client->close(); # - linger?
+    print "---------------------\n";
+}
+
+# ---
+

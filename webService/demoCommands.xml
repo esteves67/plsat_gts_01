@@ -1,0 +1,7 @@
+<!-- 
+ === Request the currently list of supported commands
+ -->
+<GTSRequest command="commands">
+    <Authorization account="demo" user="admin" password=""/>
+</GTSRequest>
+

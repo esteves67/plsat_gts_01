@@ -1,0 +1,10 @@
+<!-- 
+ === Request the Device record for device "demo2"
+ -->
+<GTSRequest command="dbget">
+    <Authorization account="demo" user="admin" password=""/>
+    <Record table="Device">
+        <Field name="accountID">demo</Field>
+        <Field name="deviceID">demo2</Field>
+    </Record>
+</GTSRequest>

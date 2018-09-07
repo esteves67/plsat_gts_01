@@ -1,0 +1,48 @@
+#!/bin/sh
+#
+# /Library/StartupItems/OpenGTS/OpenGTS
+#
+# A script to automatically start up GTS Device servers on system bootup for Mac OS X.
+#
+# The following should be appended to "/etc/hostconfig":
+#   OPENGTS=-YES-
+
+# Suppress the annoying "$1: unbound variable" error when no option was given
+if [ -z $1 ] ; then
+    echo "Usage: $0 [start|stop|restart] "
+    exit 1
+fi
+
+# Source the common setup functions for startup scripts
+test -r /etc/rc.common || exit 1
+. /etc/rc.common
+
+# Source runtime environment
+. /usr/local/opengts.env
+
+StartService ()
+{
+    if [ "${OPENGTS:=-NO-}" = "-YES-" ]; then
+        ConsoleMessage "Starting GTS Device Communication Server ..."
+        cd /
+        sudo -u ${GTS_USER} ${GTS_HOME}/bin/startServers.sh -start
+    fi
+}
+
+StopService ()
+{
+    ConsoleMessage "Stoping GTS Device Communication Server ... "
+    cd /
+    sudo -u ${GTS_USER} ${GTS_HOME}/bin/startServers.sh -stop
+}
+
+RestartService ()
+{
+    ConsoleMessage "Restarting GTS Device Communication Server ... "
+    cd /
+    sudo -u ${GTS_USER} ${GTS_HOME}/bin/startServers.sh -start
+    sleep 5
+    sudo -u ${GTS_USER} ${GTS_HOME}/bin/startServers.sh -stop
+}
+
+RunService "$1"

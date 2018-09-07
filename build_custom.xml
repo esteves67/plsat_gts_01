@@ -1,0 +1,191 @@
+<!-- 
+===============================================================================
+Project: OpenGTS - Open GPS Tracking System
+URL    : http://www.opengts.org
+File   : build_custom.xml
+===============================================================================
+-->
+
+<!-- Copyright GeoTelematic Solutions, Inc. -->
+<project name="GTS Enterprise Custom" basedir=".">
+
+  <!-- default client -->
+  <property name="client" value="gts"/>
+
+  <!-- optional server -->
+  <property name="optserver" value="example"/>
+  <available file="${src.gts}/org/opengts/opt/servers/${optserver}" type="dir" property="exists.optserver"/>
+  <target name="example" depends="optserver"/>
+
+  <!-- optional custom client build -->
+  <available file="${basedir}/build_client.xml" type="file" property="exists.optclient"/>
+
+  <!-- jar classpath -->
+  <property name="Manifest_Classpath" value="gtsutils.jar gtsdb.jar ruledb.jar bcrossdb.jar optdb.jar custom.jar"/>
+
+  <!-- ======================================================================== -->
+
+  <!-- Target: custom targets -->
+  <target name="custom" depends="custom.jar,customtrack.jar,cron,sanav,optserver,optclient"
+    description="Custom targets [${client}]"/>
+
+  <!-- ======================================================================== -->
+
+  <!-- Target: custom -->
+  <target name="custom.jar" depends="prepare,gtsdb" 
+    description="Create 'custom.jar'">
+    <echo message="GTS Enterprise (custom.jar) ..."/>
+
+    <javac srcdir="${src.gts}"
+        includeAntRuntime="false"
+        source="${compiler.source}"
+        target="${compiler.target}"
+        destdir="${build.home}"
+        debug="${compile.debug}"
+        nowarn="${compile.nowarn}"
+        deprecation="${compile.deprecation}"
+        optimize="${compile.optimize}">
+        <compilerarg compiler="${compiler.compiler}" value="${compile.Xlint}"/>
+        <classpath refid="compile.classpath"/>
+        <include name="org/opengts/custom/*/**/*.java"/>
+        <exclude name="org/opengts/custom/*/war/**"/>
+    </javac>
+
+    <!-- compile "ENREFunctions.java" -->
+    <!-- (continue if this compile fails) -->
+    <javac srcdir="${src.gts}"
+        includeAntRuntime="false"
+        source="${compiler.source}"
+        target="${compiler.target}"
+        destdir="${build.home}"
+        debug="${compile.debug}"
+        nowarn="${compile.nowarn}"
+        deprecation="${compile.deprecation}"
+        optimize="${compile.optimize}"
+        failonerror="false">
+        <compilerarg line="-Xmaxerrs 1"/> <!-- "-Xmaxerrs 0" invokes a compiler bug -->
+        <compilerarg compiler="${compiler.compiler}" value="-Xlint:all,-serial,-path"/>
+        <classpath refid="compile.classpath"/>
+        <include name="org/opengts/custom/gts/rule/ENREFunctions.java"/>
+    </javac>
+    <!-- -->
+
+    <jar jarfile="${build.lib}/custom.jar">
+        <fileset dir="${build.home}">
+            <include name="org/opengts/custom/*/**/*.class"/>
+            <exclude name="org/opengts/custom/*/war/**"/>
+            <include name="org/opengts/custom/*/**/*.properties"/>
+        </fileset>
+    </jar>
+    
+  </target>
+
+  <!-- ======================================================================== -->
+
+  <!-- Target: customtrack.jar -->
+  <target name="customtrack.jar" depends="prepare,gtsdb" 
+    description="Create 'customtrack.jar'">
+    <echo message="GTS Enterprise (customtrack.jar) ..."/>
+    
+    <javac srcdir="${src.gts}"
+        includeAntRuntime="false"
+        source="${compiler.source}"
+        target="${compiler.target}"
+        destdir="${build.home}"
+        debug="${compile.debug}"
+        nowarn="${compile.nowarn}"
+        deprecation="${compile.deprecation}"
+        optimize="${compile.optimize}">
+        <compilerarg compiler="${compiler.compiler}" value="${compile.Xlint}"/>
+        <classpath refid="compile.war.classpath"/>
+        <include name="org/opengts/custom/*/war/**/*.java"/>
+    </javac>
+
+    <jar jarfile="${build.lib}/customtrack.jar">
+        <fileset dir="${build.home}">
+            <include name="org/opengts/custom/*/war/**/*.class"/>
+            <include name="org/opengts/custom/*/war/**/*.properties"/>
+        </fileset>
+    </jar>
+    
+  </target>
+
+  <!-- ======================================================================== -->
+
+  <!-- Target: Cron scheduler -->
+  <target name="cron" depends="prepare,gtsdb" 
+    description="Create Cron scheduler 'cron.jar'">
+    <echo message="Cron server 'cron.jar' ..."/>
+
+    <javac srcdir="${src.gts}"
+        includeAntRuntime="false"
+        source="${compiler.source}"
+        target="${compiler.target}"
+        destdir="${build.home}"
+        debug="${compile.debug}"
+        nowarn="${compile.nowarn}"
+        deprecation="${compile.deprecation}"
+        optimize="${compile.optimize}">
+        <compilerarg compiler="${compiler.compiler}" value="${compile.Xlint}"/>
+        <classpath refid="compile.classpath"/>
+        <include name="org/opengts/extra/servers/cron/**/*.java"/>
+    </javac>
+
+    <jar jarfile="${build.lib}/cron.jar">
+        <manifest>
+            <attribute name="Class-Path" value="${Manifest_Classpath}"/>
+            <attribute name="Main-Class" value="org.opengts.extra.servers.cron.Main"/>
+        </manifest>
+        <fileset dir="${build.home}">
+            <include name="org/opengts/extra/servers/cron/**/*.class"/>
+        </fileset>
+    </jar>
+
+  </target>
+
+  <!-- ======================================================================== -->
+
+  <!-- Target: optserver - Optional Device Communication Server -->
+  <target name="optserver" if="exists.optserver" depends="prepare,gtsdb" 
+    description="Create Optional Device Communication Server '${optserver}.jar'">
+    <echo message="Device Communication Server '${optserver}.jar' ..."/>
+    
+    <javac srcdir="${src.gts}"
+        includeAntRuntime="false"
+        source="${compiler.source}"
+        target="${compiler.target}"
+        destdir="${build.home}"
+        debug="${compile.debug}"
+        nowarn="${compile.nowarn}"
+        deprecation="${compile.deprecation}"
+        optimize="${compile.optimize}">
+        <compilerarg compiler="${compiler.compiler}" value="${compile.Xlint}"/>
+        <classpath refid="compile.classpath"/>
+        <include name="org/opengts/opt/servers/${optserver}/**/*.java"/>
+    </javac>
+    
+    <jar jarfile="${build.lib}/${optserver}.jar">
+        <manifest>
+            <attribute name="Class-Path" value="${Manifest_Classpath}"/>
+            <attribute name="Main-Class" value="org.opengts.opt.servers.${optserver}.Main"/>
+        </manifest>
+        <fileset dir="${build.home}">
+            <include name="org/opengts/opt/servers/${optserver}/**/*.class"/>
+        </fileset>
+    </jar>
+    
+    <copy todir="${basedir}/lib/gtsopt" failonerror="true" verbose="true">
+        <fileset dir="${build.lib}">
+           <include name="${optserver}.jar"/>
+        </fileset>
+    </copy>
+    
+  </target>
+
+  <!-- ======================================================================== -->
+  <import file="${basedir}/build_client.xml" optional="true"/>
+  <target name="optclient" if="exists.optclient" depends="prepare,gtsdb,client" 
+    description="Custom client code"/>
+  <!-- ======================================================================== -->
+
+</project>

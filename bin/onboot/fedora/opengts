@@ -1,0 +1,104 @@
+#!/bin/bash
+# chkconfig: 345 91 10
+# description: Starts and stops the GTS/OpenGTS device servers.
+# -----------------------------------------------------------------------------
+# This is the init script for starting up the
+#  OpenGTS device servers
+# -----------------------------------------------------------------------------
+# This file should installed as follows:
+#   % cp $GTS_HOME/bin/onboot/fedora/opengts /etc/init.d/.
+#   % chkconfig --add opengts
+#   % chkconfig opengts on
+#   % chkconfig --list opengts
+# Restart service
+#   % service opengts restart
+# -----------------------------------------------------------------------------
+
+# -- GTS installation directory
+GTS_INSTALL_DIR="/usr/local"
+
+# -- Source function library.
+. /etc/rc.d/init.d/functions
+
+# -- Get config.
+. /etc/sysconfig/network
+
+# -- Check that networking is up.
+[ "${NETWORKING}" = "no" ] && exit 0
+
+# - MySQL should be up and running
+# ?(the command-line tool 'ntsysv' may assist in setting mysqld to autostart)
+
+# -- Load GTS_HOME, CATALINA_HOME, JAVA_HOME, ANT_HOME environment vars
+GTS_VARS_ENV="${GTS_INSTALL_DIR}/gts_vars.env"
+if [ ! -f "${GTS_VARS_ENV}" ]; then
+    action $"GTS: missing env file '${GTS_VARS_ENV}': " /bin/false
+    RETVAL=1
+    exit ${RETVAL}
+fi
+. ${GTS_VARS_ENV}
+
+# -- check GTS_USER
+if [ "${GTS_USER}" = "" ]; then
+    action $"GTS: GTS_USER undefined: " /bin/false
+    RETVAL=1
+    exit ${RETVAL}
+fi
+
+# -- check GTS_HOME
+if [ "${GTS_HOME}" = "" ]; then
+    action $"GTS: GTS_HOME undefined: " /bin/false
+    RETVAL=1
+    exit ${RETVAL}
+fi
+
+# --
+start() {
+    echo -n $"Starting GTS Servers ... "
+    /bin/su ${GTS_USER} -c '${GTS_HOME}/bin/startServers.sh -start'
+    RETVAL=$?
+    if [ $RETVAL -eq 0 ]; then
+        action $"Started GTS Servers "  /bin/true
+    else
+        action $"GTS Servers failed to start "  /bin/false
+    fi
+}
+
+# --
+stop() {
+    echo -n $"Stopping GTS Servers ... "
+    /bin/su ${GTS_USER} -c '${GTS_HOME}/bin/startServers.sh -stop'
+    RETVAL=$?
+    if [ $RETVAL -eq 0 ]; then
+        action $"Stopped GTS Servers "  /bin/true
+    else
+        action $"GTS Servers failed to stop "  /bin/false
+    fi
+}
+
+# -- check command-line args
+case "$1" in
+
+    start )
+        start
+        ;;
+        
+    stop )
+        stop
+        ;;
+        
+    status )
+        #status opengts
+        ;;
+        
+    restart )
+        stop
+        start
+        ;;
+        
+    *)
+        echo $"Usage: $0 {start|stop|restart}"
+        exit 1
+        
+esac
+exit 0

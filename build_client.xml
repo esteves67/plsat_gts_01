@@ -1,0 +1,20 @@
+<!-- 
+===============================================================================
+Copyright: Copyright 2008-2012 GeoTelematic Solutions, Inc.
+Project  : OpenGTS - Open GPS Tracking System
+URL      : http://www.opengts.org
+File     : build_client.xml
+===============================================================================
+-->
+
+<project name="GTS Custom" default="client" basedir=".">
+
+  <!-- ======================================================================== -->
+
+  <!-- Target: custom -->
+  <target name="client" description="Custom targets">
+  </target>
+
+  <!-- ======================================================================== -->
+
+</project>

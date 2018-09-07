@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no' ?>
+<!DOCTYPE DCServerConfig SYSTEM "dcservers.dtd" >
+ 
+<DCServerConfig>
+
+    <!-- ================================================================================ -->
+    <DCServer name="sms">
+
+        <!--
+         === DCS Description
+         -->
+        <Description><![CDATA[
+            Generic SMS
+            ]]></Description>
+            
+        <!--
+         === DCS Attributes
+         -->
+        <Attributes><![CDATA[
+            jarOptional=true
+            commandSms=true
+            ]]></Attributes>
+            
+        <!--
+         === DCS runtime properties
+         -->
+        <Properties>
+        
+            <!-- <Property key="SmsGatewayHandler.subject.smsEmail"></Property> --> <!-- IE: @example.com -->
+            <!-- <Property key="SmsGatewayHandler.body.smsEmail"></Property> -->    <!-- IE: @example.com -->
+
+            </Properties>
+
+        <!-- 
+         === DCS Server to Device Commands 
+         -->
+        <Commands dispatchPort="0">
+
+            <!-- ACL -->
+            <AclName>acl.dcs.sms</AclName>
+
+            <!-- Locate SMS (Ping) -->
+            <Command name="LocateSMS" enabled="false">
+                <Type>admin</Type>
+                <Description>SMS Locate</Description>
+                <String protocol="sms"><![CDATA[WhereAreYou?]]></String>
+                <StatusCode></StatusCode>
+            </Command>
+
+            <!-- Send General Command via (should be disabled for production) -->
+            <Command name="CommandSMS" enabled="false">
+                <Type>admin</Type>
+                <Description>Send Text (SMS)</Description>
+                <String protocol="sms"><![CDATA[${arg}]]></String>
+                <StatusCode></StatusCode>
+            </Command>
+
+        </Commands>
+
+    </DCServer>
+
+    <!-- ================================================================================ -->
+
+</DCServerConfig>

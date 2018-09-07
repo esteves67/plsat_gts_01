@@ -1,0 +1,12 @@
+<!-- 
+ === Requests a list of the accountID, deviceID, and description fields for 
+ === for all devices owned by the "demo" account.
+ -->
+<GTSRequest command="dbget">
+    <Authorization account="demo" user="admin" password=""/>
+    <Record table="Device" partial="true">
+        <Field name="accountID">demo</Field>
+        <Field name="description"/>
+    </Record>
+</GTSRequest>
+

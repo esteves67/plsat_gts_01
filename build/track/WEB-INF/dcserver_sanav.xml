@@ -1,0 +1,192 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no' ?>
+<!DOCTYPE DCServerConfig SYSTEM "dcservers.dtd" >
+
+<!-- 
+  =======================================================================================
+  GTS Enterprise Device Communication Server configuration file
+  Copyright 2007-2012 GeoTelematic Solutions, Inc.
+  =======================================================================================
+-->
+
+<DCServerConfig>
+
+    <!-- ================================================================================ -->
+    <DCServer name="sanav">
+
+        <!--
+         === DCS Description
+         -->
+        <Description><![CDATA[
+            Sanav
+            ]]></Description>
+
+        <!--
+         === Supported Device Models
+         -->
+        <ModelNames><![CDATA[
+            GC-101
+            GX-101
+            GS-818
+            CT-24
+            ]]></ModelNames>
+
+        <!--
+         === DCS Attributes
+         -->
+        <Attributes><![CDATA[
+            jarOptional=false
+            hasInputs=true
+            hasOutputs=true
+            transmitSms=false
+            transmitUdp=true
+            transmitTcp=true
+            transmitSat=false
+            commandSms=false
+            commandUdp=false
+            commandTcp=false
+            ]]></Attributes>
+
+        <!-- 
+         === Possible Unique-ID prefixes ("*" means that the mobile-id is used as-is)
+         === Example: If the mobile-id is "123456789012345", then the "Unique ID" value
+         === set in the Device admin page can be one of the following:
+         ===   imei_123456789012345
+         ===   123456789012345
+         ===   <etc.>
+         -->
+        <UniqueIDPrefix><![CDATA[
+            sanav_
+            gc_
+            gx_
+            gc101_
+            gx101_
+            imei_
+            *
+            ]]></UniqueIDPrefix>
+
+        <!-- 
+         === Listen ports
+         -->
+        <ListenPorts 
+            tcpPort="31220" 
+            udpPort="31220"
+            />
+
+        <!--
+         === DCS runtime properties
+         -->
+        <Properties>
+
+            <Property key="minimumSpeedKPH">3.0</Property>
+            <!--
+             === "minimumSpeedKPH" - The minimum speed value, below which the device will
+             === be assumed to be stopped, and the 'speed' will be explicitly set to '0.0'.
+             -->
+
+            <Property key="minimumMovedMeters">0</Property>
+            <!--
+             === "minimumMovedMeters" - if > '0', subsequent received events will be omitted if
+             === they are within the specified number of meters to the previous event.  Useful
+             === for eliminating multiple events at the same location, when the device continues
+             === to periodically report a location even if the device is stopped.
+             -->
+
+            <Property key="statusLocationInMotion">true</Property>
+            <!--
+             === "statusLocationInMotion" - If true, the DCS will replace an event with a
+             === STATUS_LOCATION status code with a STATUS_MOTION_IN_MOTION status code, if
+             === the speed of the vehicle is greater than zero.
+             -->
+
+            <Property key="estimateOdometer">true</Property>
+            <!-- 
+             === "estimateOdometer" - If true, the DCS will calculate the current event odometer
+             === based on the distance traveled since the last valid GPS location
+             -->
+
+            <Property key="simulateGeozones">true</Property>
+            <!--
+             === "simulateGeozones" - If true, the DCS will check for geozone arrivals/departures
+             === and insert the appropriate arrive/depart events.
+             -->
+
+            <Property key="tcpIdleTimeoutMS">10000</Property>
+            <Property key="tcpPacketTimeoutMS">10000</Property>
+            <Property key="tcpSessionTimeoutMS">10000</Property>
+            <!-- 
+             === TCP Connection timeouts
+             -->
+
+            </Properties>
+        
+        <!-- Alarm code to Status code mapping -->
+        <EventCodeMap enabled="false">
+            <!-- The "key" attribute represents the default status code generated
+             === by the device.  The following node text represents the
+             === status code which will be assigned to the generated event when
+             === inserted into the EventData table.
+             -->
+             
+            <!-- standard events -->
+            <Code key="AUTO"      >0xF020</Code> <!-- STATUS_LOCATION            -->
+            <Code key="SOS"       >0xF030</Code> <!-- STATUS_WAYMARK_0           -->
+            <Code key="PANIC"     >0xF841</Code> <!-- STATUS_PANIC_ON            -->
+            <Code key="MOVE"      >0xF11C</Code> <!-- STATUS_MOTION_MOVING       -->
+            <Code key="POLL"      >0xF040</Code> <!-- STATUS_QUERY               -->
+            <Code key="GIN"       >0xF210</Code> <!-- STATUS_GEOFENCE_ARRIVE     -->
+            <Code key="GOUT"      >0xF230</Code> <!-- STATUS_GEOFENCE_DEPART     -->
+            <Code key="GFIN"      >0xF210</Code> <!-- STATUS_GEOFENCE_ARRIVE     -->
+            <Code key="GFOUT"     >0xF230</Code> <!-- STATUS_GEOFENCE_DEPART     -->
+            <Code key="GF1IN"     >0xF210</Code> <!-- STATUS_GEOFENCE_ARRIVE     -->
+            <Code key="GF1OUT"    >0xF230</Code> <!-- STATUS_GEOFENCE_DEPART     -->
+            <Code key="GF2IN"     >0xF210</Code> <!-- STATUS_GEOFENCE_ARRIVE     -->
+            <Code key="GF2OUT"    >0xF230</Code> <!-- STATUS_GEOFENCE_DEPART     -->
+            <Code key="GF3IN"     >0xF210</Code> <!-- STATUS_GEOFENCE_ARRIVE     -->
+            <Code key="GF3OUT"    >0xF230</Code> <!-- STATUS_GEOFENCE_DEPART     -->
+            <Code key="GF4IN"     >0xF210</Code> <!-- STATUS_GEOFENCE_ARRIVE     -->
+            <Code key="GF4OUT"    >0xF230</Code> <!-- STATUS_GEOFENCE_DEPART     -->
+            <Code key="PARK"      >0xF2C0</Code> <!-- STATUS_PARKED              -->
+            <Code key="UNPARK"    >0xF2C6</Code> <!-- STATUS_UNPARKED            -->
+            <Code key="UNPA"      >0xF2C6</Code> <!-- STATUS_UNPARKED            -->
+            <Code key="START"     >0xF020</Code> <!-- STATUS_LOCATION            -->
+            <Code key="ACCON"     >0xF401</Code> <!-- STATUS_IGNITION_ON         -->
+            <Code key="ACCOFF"    >0xF403</Code> <!-- STATUS_IGNITION_OFF        -->
+            <Code key="LP"        >0xFD10</Code> <!-- STATUS_LOW_BATTERY         -->
+            <Code key="DC"        >0xFD13</Code> <!-- STATUS_POWER_FAILURE       -->
+            <Code key="CH"        >0xFD15</Code> <!-- STATUS_POWER_RESTORED      -->
+            <Code key="OPEN"      >0xF420</Code> <!-- STATUS_INPUT_ON_00         -->
+            <Code key="CLOSE"     >0xF440</Code> <!-- STATUS_INPUT_OFF_00        -->
+            <Code key="ALARM1"    >0xF420</Code> <!-- STATUS_INPUT_ON_00         -->
+            <Code key="ALARM2"    >0xF421</Code> <!-- STATUS_INPUT_ON_01         -->
+            <Code key="ALARM3"    >0xF422</Code> <!-- STATUS_INPUT_ON_02         -->
+            <Code key="ALARM4"    >0xF423</Code> <!-- STATUS_INPUT_ON_03         -->
+            <Code key="ALARM5"    >0xF424</Code> <!-- STATUS_INPUT_ON_04         -->
+            <Code key="ALARM6"    >0xF425</Code> <!-- STATUS_INPUT_ON_05         -->
+            <Code key="STATIONARY">0xF114</Code> <!-- STATUS_MOTION_DORMANT      -->
+            <Code key="VIBRATION" >0xF891</Code> <!-- STATUS_VIBRATION_ON        -->
+            <Code key="OVERSPEED" >0xF11A</Code> <!-- STATUS_MOTION_EXCESS_SPEED -->
+
+            </EventCodeMap>
+
+        <!-- 
+         === Server to Device commands (if supported)
+         -->
+        <Commands dispatchPort="30220">
+
+            <!-- ACL -->
+            <AclName>acl.dcs.sanav</AclName>
+
+            <!-- Locate Now (Ping) -->
+            <Command name="LocateNow">
+                <Type>map</Type> <!-- change to "map" to include on map -->
+                <Description>Locate Now</Description>
+                <String protocol="sms"><![CDATA[#username,0000,10]]></String>
+                <StatusCode></StatusCode>
+                </Command>
+
+                </Commands>
+
+    </DCServer>
+
+</DCServerConfig>
+

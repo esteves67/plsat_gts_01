@@ -1,0 +1,69 @@
+<!-- Crontab 
+<Crontab 
+    timeZone="US/Pacific"   == timezone used for Job 'When' specification
+    interval="60"           == periodic interval for checking Job 'When' triggers (in seconds)
+    autoReload="false"      == if "true", the crontab xml file will be reloaded if changed
+    threadPoolSize="1"      == the maximum size of the thread pool
+    >
+    <Job 
+        name="LS"           == name of Job
+        thread="true"       == run in thread
+        active="false"      == "true" to process job, "false" to ignore
+        >
+        <Title>Job Title</Title>                    == printed Job title
+        <Classpath>path_1;path_2;etc</Classpath>    == ';' separated classpath
+        <Class>some.classname</Class>               == class name
+        <Method>cron</Method>                       == method name
+        <Arg>arg1</Arg>                             == String argument #1
+        <Arg>arg2</Arg>                             == String argument #2
+        <When                                       
+            monthDay="1"                            == day of month  ["1" is first day of month]
+            weekDay="sun"                           == day of week   ["sun" is Sunday]
+            hour="*/2"                              == hour [0..23]  ["*/2" is every even hour]
+            minute="*/15"                           == minute [0..59] ["*/15" is every 15 minutes
+            />                                      == also: */15 */2 * 1 sun
+    </Job>
+</Crontab>
+-->
+<!-- 
+ === All job execution is serialize through a single thread (ie. threadPoolSize="1")
+ ===   timeZone="US/Pacific"    timezone used for Job 'When' specification
+ ===   interval="60"            periodic interval for checking Job 'When' triggers (in seconds)
+ ===   autoReload="false"       if "true", the crontab xml file will be reloaded if changed
+ ===   threadPoolSize="1"       the maximum size of the thread pool
+ -->
+<Crontab 
+    timeZone="US/Pacific"   
+    interval="60"           
+    autoReload="false"      
+    threadPoolSize="1"      
+    >
+
+  <!-- Example executing an "ls -laF" every minute -->
+  <Job name="LS" active="false">
+     <Class>org.opengts.extra.util.Cron</Class>
+     <Method>exec</Method>
+     <Arg>c:\bin\ls</Arg>
+     <Arg>-laF</Arg>
+     <When hour="*" minute="*/1"/>
+  </Job>
+
+  <!-- Example displaying the current time every minute -->
+  <Job name="DateTime1" active="false">
+     <Title>Current Date/Time [/1]</Title>
+     <Class>org.opengts.util.DateTime</Class>
+     <Method>main</Method>
+     <Arg>-tz=US/Central</Arg>
+     <When hour="*" minute="*/1"/>
+  </Job>
+
+  <!-- Example displaying the current time every 2 minutes -->
+  <Job name="DateTime2" active="false">
+     <Title>Current Date/Time [/2]</Title>
+     <Class>org.opengts.util.DateTime</Class>
+     <Method>main</Method>
+     <Arg>-tz=US/Central</Arg>
+     <When hour="*" minute="*/2"/>
+  </Job>
+
+</Crontab>

@@ -1,0 +1,8 @@
+
+.navBar { 
+  font-size: 10pt; 
+  padding-bottom: 1px; 
+  background-color: #EFEFEF; 
+  /* border-top: solid #555555 1px; */
+  border-bottom: solid #555555 1px;
+}

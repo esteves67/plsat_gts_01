@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE web-app PUBLIC '-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN' 'http://java.sun.com/dtd/web-app_2_3.dtd'>
+<web-app id="notification">
+
+    <display-name>NotificationRequest</display-name>
+    <description>Notification Message Request</description>
+    
+    <listener>
+        <listener-class>org.opengts.war.tools.RTConfigContextListener</listener-class>
+    </listener>
+
+    <servlet>
+        <servlet-name>Messages</servlet-name>
+        <servlet-class>org.opengts.opt.war.notification.Notification</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>Messages</servlet-name>
+        <url-pattern>/Messages</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>Messages</servlet-name>
+        <url-pattern>/Message</url-pattern>
+    </servlet-mapping>
+
+</web-app>

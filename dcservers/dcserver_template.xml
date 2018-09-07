@@ -1,0 +1,134 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no' ?>
+<!DOCTYPE DCServerConfig SYSTEM "dcservers.dtd" >
+
+<!-- 
+  =======================================================================================
+  GTS Enterprise Device Communication Server configuration file
+  Copyright 2007-2012 GeoTelematic Solutions, Inc.
+  =======================================================================================
+-->
+
+<DCServerConfig>
+
+    <!-- ================================================================================ -->
+    <DCServer name="template">
+    
+        <!--
+         === DCS Description
+         -->
+        <Description><![CDATA[
+            Example Template Server
+            ]]></Description>
+
+        <!--
+         === DCS Attributes (hints)
+         -->
+        <Attributes><![CDATA[
+            jarOptional=false
+            hasInputs=false
+            hasOutputs=false
+            transmitSms=false
+            transmitUdp=true
+            transmitTcp=true
+            transmitSat=false
+            commandSms=false
+            commandUdp=false
+            commandTcp=false
+            ]]></Attributes>
+
+        <!-- 
+         === Possible Unique-ID prefixes ("*" means that the mobile-id is used as-is)
+         === Example: If the mobile-id is "123456789012345", then the "Unique ID" value
+         === set in the Device admin page can be one of the following:
+         ===   imei_123456789012345
+         ===   123456789012345
+         ===   <etc.>
+         -->
+        <UniqueIDPrefix><![CDATA[
+            template_
+            imei_
+            *
+            ]]></UniqueIDPrefix>
+            
+        <!-- 
+         === Listen ports
+         -->
+        <ListenPorts 
+            tcpPort="31200" 
+            udpPort="31200"
+            />
+
+        <!--
+         === DCS runtime properties
+         -->
+        <Properties>
+        
+            <Property key="parseFormat">3</Property>
+            <!--
+             === "parseFormat" - The data format expected by this template DCS
+             -->
+            
+            <Property key="minimumSpeedKPH">4.0</Property>
+            <!--
+             === "minimumSpeedKPH" - The minimum speed value, below which the device will
+             === be assumed to be stopped, and the 'speed' will be explicitly set to '0.0'.
+             -->
+
+            <Property key="estimateOdometer">true</Property>
+            <!-- 
+             === "estimateOdometer" - If true, the DCS will calculate the current event odometer
+             === based on the distance traveled since the last valid GPS location
+             -->
+
+            <Property key="simulateGeozones">true</Property>
+            <!--
+             === "simulateGeozones" - If true, the DCS will check for geozone arrivals/departures
+             === and insert the appropriate arrive/depart events.
+             === (Note: may not be supported in this device communication server)
+             -->
+
+            <Property key="simulateDigitalInputs">0xFF</Property>
+            <!--
+             === "simulateDigitalInputs" - The digital input mask which will be checked for 
+             === changes in state.  Digital inputs not included in the mask will be ignored.
+             -->
+
+            <!-- 
+             === Connection timeouts
+             -->
+            <Property key="tcpIdleTimeoutMS">120000</Property>
+            <Property key="tcpPacketTimeoutMS">10000</Property>
+            <Property key="tcpSessionTimeoutMS">120000</Property>
+
+            </Properties>
+
+        <!-- 
+         === Server to Device commands (if supported)
+         -->
+        <Commands dispatchPort="30205">
+
+            <!-- ACL -->
+            <AclName>acl.dcs.template</AclName>
+
+            <!-- Locate Now (Ping) -->
+            <Command name="LocateNow" enabled="false">
+                <Type>map</Type>
+                <Description>Locate Now</Description>
+                <String protocol="udp"><![CDATA[command here]]></String>
+                <StatusCode></StatusCode>
+                </Command>
+
+            <!-- Locate Now (Ping) -->
+            <Command name="TcpTest" enabled="false">
+                <Type>map</Type>
+                <Description>TCP Test</Description>
+                <String protocol="tcp"><![CDATA[TCP Test]]></String>
+                <StatusCode></StatusCode>
+                </Command>
+
+            </Commands>
+
+    </DCServer>
+
+</DCServerConfig>
+

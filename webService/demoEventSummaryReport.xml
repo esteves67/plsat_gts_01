@@ -1,0 +1,11 @@
+<!--
+ === Request a EventSummary report for all devices (option "all")
+ -->
+<GTSRequest command="report">
+    <Authorization account="demo" user="admin" password=""/>
+    <Report name="EventSummary" option="all">
+        <DeviceGroup></DeviceGroup>
+        <TimeTo>2010/03/12</TimeTo>
+    </Report>
+</GTSRequest>
+

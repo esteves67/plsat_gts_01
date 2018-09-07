@@ -1,0 +1,100 @@
+
+body {
+	margin-left: 0px;
+	margin-top: 0px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+	background-color:#040812;
+	background-repeat:no-repeat;
+	text-align: center;
+	-webkit-font-smoothing: antialiased; /* Fix for webkit rendering */
+	-webkit-text-size-adjust: none;
+}
+
+td.titleText {
+	/* background: #DBDEEB url('./images/Banner_White90.png') center no-repeat; */
+	background: #DBDEEB url('./images/Banner_WhiteShadow.png') center no-repeat;
+	font-family: arial,verdana,sans-serif;
+	font-size: 14px;
+	font-weight: bold;
+	text-align: center;
+	color: #000000;
+}
+td.ui-user-connected{
+	background: #396b9e;
+	color: #FFFFFF;
+	height:30px;
+	padding:5px;
+	vertical-align:central;
+}
+
+input:not([type="image"]){
+	font-family: "Source Sans Pro", Tahoma, Geneva;
+	font-size: 12px;
+	padding-left: 8px;
+	padding-right: 8px;
+	padding-top: 1px;
+	padding-bottom: 1px;
+	border-color: black;
+	cursor: pointer;
+}
+
+TABLE.bannerTable {
+  /*background-color: #FFFFFF; */
+}
+
+SPAN.spanLink {
+    color: blue;
+    text-decoration: underline;
+    cursor: pointer;
+}
+SPAN.spanLink:hover { 
+    color: #00CC00;
+}
+
+FORM {
+    margin-top: 0px; 
+    margin-bottom: 0px; 
+}
+
+HR {
+    margin-top: 2px; 
+    margin-bottom: 2px; 
+}
+HR.noMargin {
+    margin-top: 0px; 
+    margin-bottom: 0px; 
+}
+
+TD { 
+    font-size: 12px; 
+    font-family: Verdana, Geneva, sans-serif;
+}
+
+
+
+SELECT { 
+	cursor:pointer;
+	border-radius:4px;
+	padding-left: 8px;
+    height: 23px;
+	font-size: 11px; 
+    font-family: Tahoma, Geneva, sans-serif;
+}
+
+SELECT:focus {
+	background-color: #FFFFFF;
+	cursor: pointer;
+}
+
+TEXTAREA { 
+    font-size: 11px; 
+    font-family: Tahoma, Geneva, sans-serif;
+}
+
+TEXTAREA:focus {
+	background-color: #FFFFFF;
+}
+
+
+

@@ -1,0 +1,16 @@
+<!--
+ === Request a range of EventData records for device "demo2"
+ -->
+<GTSRequest command="eventdata">
+    <Authorization account="demo" user="" password="" />
+    <EventData>
+        <Device>demo2</Device>
+        <TimeFrom>2010/03/12</TimeFrom>
+        <TimeTo>2010/03/12</TimeTo>
+        <GPSRequired>false</GPSRequired>
+        <Limit type="last">1000</Limit>
+        <Ascending>true</Ascending>
+        <Field name="latitude" />
+        <Field name="longitude" />
+   </EventData>
+</GTSRequest>

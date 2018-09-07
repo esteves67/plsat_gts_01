@@ -1,0 +1,7 @@
+<!-- 
+ === Requests a list of all currently available reports
+ -->
+<GTSRequest command="reportlist">
+    <Authorization account="demo" user="admin" password=""/>
+</GTSRequest>
+

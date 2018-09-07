@@ -1,0 +1,110 @@
+#!/usr/bin/perl
+# -----------------------------------------------------------------------------
+# write data to specified TCP port
+# Usage:  writeTCP -host <host> -port <port> data ...
+# -----------------------------------------------------------------------------
+
+# --- global vars
+$PrintSocket = undef;
+$LOG_PORT = undef;
+$TIMEOUT = 5;
+
+# --- options
+use Getopt::Long;
+%argctl = (
+    "host:s" => \$LOG_HOST,
+    "port=i" => \$LOG_PORT,
+    "cr"     => \$NEWLINE,
+    "nl"     => \$NEWLINE,
+    "file:s" => \$DATA_FILE,
+);
+if (!&GetOptions(%argctl) || !$LOG_PORT || ($LOG_PORT <= 0)) {
+    print "Usage: $0 [-help] -port <port> <AsciiTestData>\n";
+    print "  -h[ost] <host>  Host name\n";
+    print "  -p[ort] <port>  Port number\n";
+    exit(1);
+}
+
+# --- read data
+$DATA = join(' ', @ARGV);
+if ($DATA_FILE ne "") {
+    my $status = open(DATAFILE, "<$DATA_FILE");
+    if (!$status) {
+        print "Unable to open data file: $DATA_FILE\n";
+        exit(1);
+    }
+    my @rcds = <DATAFILE>;
+    close(DATAFILE);
+    $DATA = join('\n', @rcds);
+}
+
+# --- newline?
+if (defined $NEWLINE) {
+    $DATA .= "\n";
+}
+
+# --- send command
+#&sendCommand("<ping>");
+&sendCommand($DATA);
+
+# --- done
+&closeLog();
+exit(0);
+
+# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+use IO::Socket;
+
+sub openLog(\$) {
+    my ($host,$port) = @_;
+    &closeLog();
+    $PrintSocket = IO::Socket::INET->new(
+	    PeerAddr=>$host, 
+        PeerPort=>$port,
+        Timeout=>$TIMEOUT, # <== this doesn't seem to do anything
+        Proto=>"tcp"
+    );
+    if (!$PrintSocket) {
+        print "Unable to open socket.\n";
+        exit(1);
+    }
+    return $PrintSocket;
+}
+
+sub closeLog() {
+    if ($PrintSocket) {
+        $PrintSocket->close();
+        $PrintSocket = undef;
+    }
+}
+
+sub sendCommand(\$) {
+    my ($cmd) = @_;
+
+    # --- make sure socket is open
+    if (!$PrintSocket) { 
+        &openLog($LOG_HOST,$LOG_PORT); 
+        #if ($cmd ne "ping") { print "Socket openned ...\n"; }
+    }
+
+    # --- set timeout
+    $SIG{ALRM} = sub { &closeLog(); print "<timeout>\n"; exit(1); };
+    alarm($TIMEOUT); # - because 'Timeout=>$TIMEOUT' doesn't work
+
+    # --- write data
+    if ($cmd ne "ping") { print "Writing: $cmd\n"; }
+    $PrintSocket->send($cmd, 0);
+
+    # --- read response
+    my $resp;
+    if ($cmd ne "ping") { print "Reading ...\n"; }
+    $PrintSocket->recv($resp, 400, 0);
+    if ($cmd ne "ping") { print "Received => $resp\n"; }
+
+    # --- clear timeout / close socket
+    alarm(0);
+    &closeLog();
+
+}
+
+

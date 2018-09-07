@@ -1,0 +1,10 @@
+<!-- 
+ === Request the a command to be sent to a remote device
+ -->
+<GTSRequest command="devcmd">
+    <Authorization account="demo" user="admin" password=""/>
+    <DeviceCommand name="TCPTest" 
+        arg0="Test">
+        <Device>enfora</Device>
+    </DeviceCommand>
+</GTSRequest>

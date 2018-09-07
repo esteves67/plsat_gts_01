@@ -1,0 +1,41 @@
+<!-- EXPERIMENTAL
+ === Requests a set of reports to be emailed for a specific user 
+ -->
+<GTSRequest command="report">
+
+    <!-- Account authorization 
+     === Set the "account=", "user=", and "password=" values to match
+     === the account you wish to receive periodic reports
+     -->
+    <Authorization account="demo" user="admin" password=""/>
+    
+    <!-- Periodic report definitions below 
+     === The available reports can be found in the "reports.xml" file
+     === The "TimeFrom" and "TimeTo" formats can be specified as in the following examples:
+     ===    2011/08/20              - a specific day
+     ===    2011/08/20 14:23:12     - a specific day and time
+     ===    -2d                     - two days ago
+     ===    -1d                     - one day ago (yesterday)
+     ===    -0d                     - today
+     -->
+
+    <!-- EventDetail report - ->
+    <Report name="EventDetail" format="email">
+        <Device>demo</Device>           
+        <TimeFrom>-1d</TimeFrom>        
+        <TimeTo>-1d</TimeTo>            
+    </Report>
+    <Report name="EventDetail" format="email">
+        <Device>demo2</Device>          
+        <TimeFrom>-1d</TimeFrom>        
+        <TimeTo>-1d</TimeTo>            
+    </Report>
+    <!- - -->
+
+    <!-- EventSummary report -->
+    <Report name="EventSummary" format="email">
+        <DeviceGroup></DeviceGroup>     <!-- all devices -->
+        <TimeTo>-1d</TimeTo>            <!-- yesterday as-of 23:59:59 -->
+    </Report>
+    
+</GTSRequest>

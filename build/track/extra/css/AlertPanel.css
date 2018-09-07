@@ -1,0 +1,87 @@
+
+/* Alert table */
+Table.alertTable {
+    border: double 3px black;
+    width: 410px;
+}
+
+/* ALert image/icon */
+TD.alertImage_off {
+    background: white url('../../extra/images/BigDot_green.png') center no-repeat;
+    width: 120px;
+    height: 120px;
+    vertical-align: middle;
+    text-align: center;
+}
+TD.alertImage_on {
+    background: white url('../../extra/images/BigDot_red.png') center no-repeat;
+    width: 120px;
+    height: 120px;
+    vertical-align: middle;
+    text-align: center;
+}
+TD.alertImage_login {
+    background: white url('../../extra/images/BigDot_yellow.png') center no-repeat;
+    width: 120px;
+    height: 120px;
+    vertical-align: middle;
+    text-align: center;
+}
+
+/* Alert state text */
+TD.alertStateText_off {
+    font-weight: bold;
+    font-size: 12pt;
+    color: green;
+    vertical-align: top;
+    text-align: right;
+}
+TD.alertStateText_on {
+    font-weight: bold;
+    font-size: 12pt;
+    color: red;
+    vertical-align: top;
+    text-align: right;
+}
+TD.alertStateText_login {
+    font-weight: bold;
+    font-size: 12pt;
+    color: #DDD700;
+    vertical-align: top;
+    text-align: right;
+}
+
+/* ALert action text */
+TD.alertActionText_off {
+    font-size: 10pt;
+    color: black;
+    text-align: right;
+}
+TD.alertActionText_on {
+    font-size: 10pt;
+    color: black;
+    text-align: right;
+    text-decoration: underline; 
+    color: blue; 
+    cursor: pointer;
+}
+TD.alertActionText_login {
+    font-size: 10pt;
+    color: black;
+    text-align: right;
+}
+
+/* Alert poll interval text */
+TD.alertPollInterval {
+    font-size: 10pt;
+    color: black;
+    vertical-align: bottom;
+    text-align: right;
+}
+
+/* Alert rule name */
+SPAN.alertRuleName {
+    font-size: 8pt;
+    vertical-align: middle;
+    padding-bottom: 4px;
+}

@@ -1,0 +1,61 @@
+<!-- 
+===============================================================================
+Project: OpenGTS - Open GPS Tracking System
+URL    : http://www.opengts.org
+File   : build_rule.xml
+===============================================================================
+This file is intended to be imported by "build.xml"
+===============================================================================
+-->
+
+<!-- Copyright 2008-2012 GeoTelematic Solutions, Inc. -->
+<project name="OpenGTS Rule Engine Web-UI" basedir=".">
+
+  <!-- ======================================================================== -->
+  <!-- ======================================================================== -->
+
+  <!-- Target: ruletrack.jar -->
+  <target name="rulewar" depends="ruletrack"/>
+  <target name="ruletrack.jar" depends="ruletrack"/>
+  <target name="ruletrack" depends="prepare,gtsdb,tomcat.env" 
+    description="Create 'ruletrack.jar'">
+    <property name="compile.war.classpath" refid="compile.war.classpath"/>
+    <echo message="Creating ruletrack.jar ..."/>
+
+    <!-- compile -->
+    <javac srcdir="${src.gts}"
+        includeAntRuntime="false"
+        source="${compiler.source}"
+        target="${compiler.target}"
+        destdir="${build.home}"
+        debug="${compile.debug}"
+        nowarn="${compile.nowarn}"
+        deprecation="${compile.deprecation}"
+        optimize="${compile.optimize}">
+        <compilerarg compiler="${compiler.compiler}" value="-Xlint:all,-serial,-path"/>
+        <classpath refid="compile.war.classpath"/>
+        <include name="org/opengts/rulewar/**/*.java"/>
+    </javac>
+
+    <!-- copy Locale properties -->
+    <copy todir="${build.home}" verbose="false">
+        <fileset dir="${src.gts}">
+            <include name="org/opengts/rulewar/**/*.properties"/>
+            <exclude name="org/opengts/rulewar/**/*.java"/>
+        </fileset>
+    </copy>
+
+    <!-- create jar file -->
+    <jar jarfile="${build.lib}/ruletrack.jar">
+        <fileset dir="${build.home}">
+            <include name="org/opengts/rulewar/**/*.class"/>
+            <include name="org/opengts/rulewar/**/*.properties"/>
+        </fileset>
+    </jar>
+    
+  </target>
+
+  <!-- ======================================================================== -->
+  <!-- ======================================================================== -->
+
+</project>
